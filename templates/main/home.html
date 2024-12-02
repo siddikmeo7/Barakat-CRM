@@ -1,0 +1,11 @@
+{% extends 'main/base.html' %}
+{% block title %}Home - Nur CRM{% endblock %}
+{% block content %}
+    {% if user.is_authenticated %}
+    <h2>Welcome to Nur CRM</h2>
+    <p>Manage your clients, track profits, and automate your business efficiently.</p>
+    <a href="#" class="btn">Go to Dashboard</a>
+    {% else %}
+    <p>You are not Authenticated!</p>
+    {% endif %}
+{% endblock %}
