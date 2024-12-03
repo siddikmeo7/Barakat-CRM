@@ -1,0 +1,27 @@
+{% extends "main/base.html" %}
+
+{% block title %}Products{% endblock %}
+
+{% block content %}
+    <div class="container my-4">
+        <h1 class="mb-4">Products</h1>
+
+
+        <a href="{% url 'product-create' %}" class="btn btn-primary mb-4">Add Product</a>
+
+        <div class="row">
+            {% for product in products %}
+                <div class="col-md-4">
+                    <div class="product-card">
+                        <h5 class="product-title">{{ product.title }}</h5>
+                        <p class="product-category">{{ product.category.name }}</p>
+                        <p class="product-price">${{ product.price }}</p>
+                        <p class="product-stock">Stock: {{ product.up_to }} available</p>
+                    </div>
+                </div>
+            {% empty %}
+                <p>No products available.</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

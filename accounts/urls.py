@@ -3,7 +3,7 @@ from .views import *
 
 urlpatterns = [
     # Signup view
-    path("signup/", SignupView.as_view(), name="signup"),
+    path("signup/", UserSignupForm.as_view(), name="signup"),
     path('',LoginView.as_view(),name='login'),
     path('logout/', CustomLogoutView.as_view(), name='logout'),
     # Custom password reset views

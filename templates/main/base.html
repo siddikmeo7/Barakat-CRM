@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -19,26 +20,46 @@
         footer {
             border-top: 1px solid #ddd;
         }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
     <header class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="#">Nur CRM</a>
+            {% if user.is_authenticated %}
+                <a class="navbar-brand fw-bold" href="{% url 'profile' user.id %}">
+                    <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
+                         alt="Profile Image" class="profile-avatar rounded-circle">
+                </a>
+            {% else %}
+                <a class="navbar-brand fw-bold" href="{% url 'home' %}">Nur CRM</a>
+            {% endif %}
+    
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span> 
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/">Home</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Pages
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{% url 'product-list' %}">Products Page</a></li>
+                                <li><a class="dropdown-item" href="#">Clients Page</a></li>
+                            </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/dashboard/">Dashboard</a>
+                            <a class="nav-link" href="{% url 'home' %}">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/profile/">Profile</a>
+                            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/logout/">Logout</a>
@@ -52,10 +73,9 @@
             </div>
         </div>
     </header>
-
+    
     <main class="container my-4">
-        {% block content %}
-      
+        {% block content %}  
         {% endblock %}
     </main>
 
