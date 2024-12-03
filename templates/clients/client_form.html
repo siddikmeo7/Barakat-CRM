@@ -2,13 +2,89 @@
 {% block title %}Create/Update Client{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2 class="my-4">Client Form</h2>
+<style>
+    .card {
+        margin-top: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Save Client</button>
-    </form>
+    .card-header {
+        font-size: 1.25rem;
+        font-weight: bold;
+        background-color: #007bff;
+        color: white;
+        text-transform: uppercase;
+        padding: 10px 15px;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #333;
+    }
+
+    .form-control {
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+    }
+
+    button[type="submit"] {
+        font-size: 1rem;
+        width: 100%;
+        padding: 10px;
+        margin-top: 15px;
+        background-color: #28a745;
+        border: none;
+        border-radius: 6px;
+        color: white;
+        cursor: pointer;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #218838;
+    }
+
+    .container {
+        max-width: 600px;
+    }
+</style>
+
+<div class="container">
+    <h2 class="my-4 text-center text-primary">Client Form</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h5 class="mb-0">Enter Client Information</h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    {{ form.as_p }}
+                </div>
+
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-success">Save Client</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

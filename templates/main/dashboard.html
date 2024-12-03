@@ -43,9 +43,9 @@
                     <h5>Statistics</h5>
                 </div>
                 <div class="card-body">
-                    <p><strong>Income:</strong> $500</p>
-                    <p><strong>Orders this month:</strong> 15</p>
-                    <p><strong>Balance:</strong> $1200</p>
+                    <p><strong>Income:</strong> ${{ total_income }}</p>
+                    <p><strong>Orders this month:</strong> {{ orders_this_month }}</p>
+                    <p><strong>Balance:</strong> ${{ balance }}</p>
                     <a href="{% url 'product-list' %}" class="btn btn-success">View Details</a>
                 </div>
             </div>
@@ -65,10 +65,10 @@
                         var incomeChart = new Chart(ctx, {
                             type: 'line', 
                             data: {
-                                labels: ['January', 'February', 'March', 'April', 'May', 'June']
+                                labels: {{ months|safe }},
                                 datasets: [{
                                     label: 'Income over Time',
-                                    data: [500, 700, 800, 600, 950, 1100], 
+                                    data: {{ income_data|safe }},
                                     borderColor: 'rgba(75, 192, 192, 1)',
                                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                                     fill: true,
@@ -101,10 +101,10 @@
                         var salesChart = new Chart(ctx2, {
                             type: 'bar', 
                             data: {
-                                labels: ['Product A', 'Product B', 'Product C', 'Product D'], 
+                                labels: {{ products|safe }},
                                 datasets: [{
                                     label: 'Sales Progress',
-                                    data: [200, 300, 400, 250], 
+                                    data: {{ sales_data|safe }},
                                     backgroundColor: 'rgba(54, 162, 235, 0.2)',
                                     borderColor: 'rgba(54, 162, 235, 1)',
                                     borderWidth: 1

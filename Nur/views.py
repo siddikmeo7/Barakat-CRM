@@ -7,8 +7,27 @@ from django.contrib.auth.decorators import login_required
 from .forms import *
 from .models import *
 from django.db.models import Q
+from datetime import date
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Profile
+# Dashborad
+@login_required
+def dashboard(request):
+    user = request.user
+    profile = user.profile  
+    profile_fields = ['bio', 'date_of_birth', 'profile_picture', 'website']
+    
+    completed_fields = sum([bool(getattr(profile, field)) for field in profile_fields])
+    total_fields = len(profile_fields)
+    profile_completion = (completed_fields / total_fields) * 100
 
-
+    return render(request, 'dashboard.html', {
+        'user': user,
+        'profile_completion': round(profile_completion, 2),
+        'profile': profile
+    })
+# Home
 class HomeView(generic.TemplateView):
     template_name = 'main/home.html'
 
@@ -18,12 +37,16 @@ class HomeView(generic.TemplateView):
 class DashBoardView(generic.TemplateView):
     template_name = 'main/dashboard.html'
 
-    
+# Profile
 class ProfileCreateView(generic.CreateView):
     fields = ['bio','profile_picture','website','date_of_birth',]
     template_name = 'profile_form.html'
     success_url = reverse_lazy('home')
 
+def product_detail(request, product_id):
+    product = Product.objects.get(id=product_id)
+    benefit = (product.price - product.cost_price) * product.sold
+    return render(request, 'product_detail.html', {'product': product, 'benefit': benefit})
 class ProfileDetailView(LoginRequiredMixin, generic.DetailView):
     model = Profile
     template_name = 'user/profile.html'
@@ -36,9 +59,23 @@ class ProfileDetailView(LoginRequiredMixin, generic.DetailView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         profile = context['profile'] 
         products = Product.objects.filter(user=self.request.user)  
         total_benefit = 0
+
+        profile = context['profile']  
+        products = Product.objects.filter(user=self.request.user) 
+        total_benefit = 0
+        for product in products:
+            if product.sold > 0 and product.price: 
+                total_benefit += (product.price - product.cost_price) * product.sold 
+
+        context['total_benefit'] = total_benefit
+        context['profile'] = profile 
+        return context
+
+
 
         for product in products:
             if product.sold > 0 and product.price:  
@@ -47,7 +84,6 @@ class ProfileDetailView(LoginRequiredMixin, generic.DetailView):
         context['total_benefit'] = total_benefit
         context['profile'] = profile  
         return context
-
     
 def create_or_edit_profile(request, pk=None):
     if pk:
@@ -68,19 +104,16 @@ def create_or_edit_profile(request, pk=None):
         form = ProfileForm(instance=profile) if profile else ProfileForm()
     return render(request, 'user/profile_form.html', {'form': form})
 
-
 class ProfileDeleteView(generic.DeleteView):
     model = Profile
     template_name = 'profile_confirm_delete.html'
     success_url = reverse_lazy('home')
-
 
 # Country Views
 class CountryListView(generic.ListView):
     model = Country
     template_name = 'country_list.html'
     context_object_name = 'countries'
-
 
 class CountryDetailView(generic.DetailView):
     model = Country
@@ -93,7 +126,6 @@ class CountryCreateView(generic.CreateView):
     fields = ['name']
     template_name = 'country_form.html'
     success_url = reverse_lazy('country-list')
-
 
 class CountryUpdateView(generic.UpdateView):
     model = Country
@@ -177,6 +209,10 @@ class ProductListView(generic.ListView):
         context['categories'] = Category.objects.all() 
         return context
 
+from django.shortcuts import render
+from django.views import generic
+from .models import Product
+
 class ProductDetailView(generic.DetailView):
     model = Product
     template_name = 'products/product_detail.html'
@@ -185,11 +221,16 @@ class ProductDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         product = context['product']
-        if hasattr(product, 'cost_price'):
-            benefit = (product.price - product.cost_price) * product.sold
+
+        if product.sold > 0 and product.price and product.cost_price:
+            profit_per_product = product.price - product.cost_price
+            total_profit = profit_per_product * product.sold
         else:
-            benefit = 0 
-        context['benefit'] = benefit
+            profit_per_product = 0
+            total_profit = 0
+        
+        context['profit_per_product'] = profit_per_product
+        context['total_profit'] = total_profit
         return context
 
 @login_required 
@@ -205,9 +246,6 @@ def product_create(request):
         form = ProductForm()
     return render(request, 'products/product_form.html', {'form': form})
 
-from django.shortcuts import render, get_object_or_404
-from .models import Product
-from .forms import ProductForm
 
 def product_update_view(request, pk):
     product = get_object_or_404(Product, pk=pk)

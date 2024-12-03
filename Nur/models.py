@@ -79,30 +79,21 @@ class City(models.Model):
 
 # Product Models
 class Product(models.Model):
-    user = models.ForeignKey("Nur.CustomUser",on_delete=models.CASCADE)
+    user = models.ForeignKey("Nur.CustomUser", on_delete=models.CASCADE)
     category = models.ForeignKey("Nur.Category", on_delete=models.CASCADE, related_name="products")
     title = models.CharField(max_length=50, null=True, blank=True)
     index = models.CharField(max_length=50, unique=True, db_index=True, help_text="Unique identifier for the product")
     colour = models.ForeignKey("Nur.Colour", on_delete=models.CASCADE, related_name="products")
     price = models.DecimalField(max_digits=15, decimal_places=2, help_text="Current product price")
+    cost_price = models.DecimalField(max_digits=15, decimal_places=2, help_text="Product cost price")  # Add this field
     up_to = models.DecimalField(max_digits=15, decimal_places=2, validators=[MinValueValidator(0)], help_text="Maximum quantity available")
     sold = models.DecimalField(max_digits=15, decimal_places=2, validators=[MinValueValidator(0)], help_text="Total quantity sold")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
-    def sell(self, quantity):
-        if quantity > self.up_to:
-            raise ValidationError("Not enough stock available to sell this quantity.")
-        self.sold += quantity
-        self.up_to -= quantity
-        self.save()
-
-    def get_revenue(self):
-        return self.sold * self.price
-
     def __str__(self):
-        return f"{self.title} ({self.index})"
+        return f"{self.title or 'Unnamed Product'} - {self.colour.name} (Category: {self.category.name})"
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
