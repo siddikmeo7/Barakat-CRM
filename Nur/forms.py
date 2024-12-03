@@ -52,10 +52,12 @@ from .models import Product
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['title', 'index', 'category', 'colour', 'price', 'up_to', 'sold', ]
+        fields = ['title', 'index', 'price', 'cost_price', 'sold', 'category', 'colour', 'up_to']
 
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     category = forms.ModelChoiceField(queryset=Category.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
     price = forms.DecimalField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    cost_price = forms.DecimalField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    sold = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
     up_to = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
 
