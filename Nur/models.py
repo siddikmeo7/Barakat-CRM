@@ -16,7 +16,6 @@ class CustomUser(AbstractUser):
     )
     country = models.ForeignKey("Nur.Country", on_delete=models.CASCADE, related_name="users",null=True,blank=True)
     city = models.ForeignKey("Nur.City", on_delete=models.CASCADE, related_name="users", null=True, blank=True)
-    region = models.ForeignKey("Nur.Region", on_delete=models.CASCADE, related_name="users",null=True,blank=True)
     address = models.TextField(null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     last_password_reset = models.DateTimeField(null=True, blank=True)
@@ -39,6 +38,7 @@ class Profile(models.Model):
     date_of_birth = models.DateField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"Profile of {self.user.username}"
@@ -46,6 +46,7 @@ class Profile(models.Model):
 # Location Models
 class Country(models.Model):
     name = models.CharField(max_length=50)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -53,19 +54,14 @@ class Country(models.Model):
 class City(models.Model):
     name = models.CharField(max_length=50)
     country = models.ForeignKey("Nur.Country", on_delete=models.CASCADE, related_name="cities")
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.name} (Country: {self.country.name})"
 
-class Region(models.Model):
-    name = models.CharField(max_length=50)
-    city = models.ForeignKey("Nur.City", on_delete=models.CASCADE, related_name="regions")
-
-    def __str__(self):
-        return f"{self.name} (City: {self.city.name})"
-
 # Product Models
 class Product(models.Model):
+    user = models.ForeignKey("Nur.CustomUser",on_delete=models.CASCADE)
     category = models.ForeignKey("Nur.Category", on_delete=models.CASCADE, related_name="products")
     title = models.CharField(max_length=50, null=True, blank=True)
     index = models.CharField(max_length=50, unique=True, db_index=True, help_text="Unique identifier for the product")
@@ -75,18 +71,21 @@ class Product(models.Model):
     sold = models.DecimalField(max_digits=15, decimal_places=2, validators=[MinValueValidator(0)], help_text="Total quantity sold")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.title or 'Unnamed Product'} - {self.colour.name} (Category: {self.category.name})"
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
 
 class Colour(models.Model):
     name = models.CharField(max_length=50)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -94,13 +93,15 @@ class Colour(models.Model):
 # Sklad (Warehouse) Models
 class Sklad(models.Model):
     name = models.CharField(max_length=50)
-
+    is_active = models.BooleanField(default=True)
     def __str__(self):
         return self.name
 
 class SkladProduct(models.Model):
     sklad = models.ForeignKey("Nur.Sklad", on_delete=models.CASCADE, related_name="sklad_products")
     product = models.ForeignKey("Nur.Product", on_delete=models.CASCADE, related_name="sklad_products")
+    quantity = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.sklad.name} - {self.product.title or 'Unnamed Product'}"

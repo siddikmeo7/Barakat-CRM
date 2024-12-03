@@ -13,6 +13,7 @@ from django.views.generic import CreateView
 from django.shortcuts import redirect
 from Nur.forms import CustomUserForm
 from django.contrib.auth.views import LogoutView
+from django.core.mail import send_mail
 
 class LoginView(DjangoLoginView):
     template_name = 'registration/login.html'
@@ -23,11 +24,19 @@ class CustomLogoutView(LogoutView):
     next_page = reverse_lazy("registration/logout")
 
 
-class SignupView(CreateView):
+class UserSignupForm(CreateView):
     form_class = CustomUserForm
     template_name = "registration/signup.html"
     success_url = reverse_lazy("home")
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        user = form.save()
+        subject = 'Welcome to Our Website'
+        message = f"Hello {user.username},\n\nThank you for registering with us. We are excited to have you on board!"
+        from_email = 'NurBussiness@example.com'
+        send_mail(subject, message, from_email, [user.email])
+        return response
 
 # Password Reset View
 class CustomPasswordResetView(PermissionRequiredMixin, DjangoPasswordResetView):

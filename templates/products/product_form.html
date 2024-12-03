@@ -1,0 +1,38 @@
+{% extends "main/base.html" %}
+
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="id_title" class="form-label">Title</label>
+        <input type="text" name="title" class="form-control" id="id_title" value="{{ form.title.value }}">
+        {% for error in form.title.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+    <div class="mb-3">
+        <label for="id_category" class="form-label">Category</label>
+        <select name="category" class="form-control" id="id_category">
+            {% for option in form.category.field.queryset %}
+                <option value="{{ option.id }}" {% if option.id == form.category.value %} selected {% endif %}>{{ option }}</option>
+            {% endfor %}
+        </select>
+        {% for error in form.category.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+    <div class="mb-3">
+        <label for="id_price" class="form-label">Price</label>
+        <input type="number" name="price" class="form-control" id="id_price" value="{{ form.price.value }}">
+        {% for error in form.price.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+    <div class="mb-3">
+        <label for="id_up_to" class="form-label">Stock</label>
+        <input type="number" name="up_to" class="form-control" id="id_up_to" value="{{ form.up_to.value }}">
+        {% for error in form.up_to.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+    <button type="submit" class="btn btn-primary">Add Product</button>
+</form>
