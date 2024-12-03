@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.timezone import now
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, RegexValidator
 
@@ -90,8 +91,18 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
 
+    def sell(self, quantity):
+        if quantity > self.up_to:
+            raise ValidationError("Not enough stock available to sell this quantity.")
+        self.sold += quantity
+        self.up_to -= quantity
+        self.save()
+
+    def get_revenue(self):
+        return self.sold * self.price
+
     def __str__(self):
-        return f"{self.title or 'Unnamed Product'} - {self.colour.name} (Category: {self.category.name})"
+        return f"{self.title} ({self.index})"
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
@@ -135,4 +146,3 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order #{self.id} - {self.client.name}"
-

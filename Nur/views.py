@@ -24,7 +24,6 @@ class ProfileCreateView(generic.CreateView):
     template_name = 'profile_form.html'
     success_url = reverse_lazy('home')
 
-
 class ProfileDetailView(LoginRequiredMixin, generic.DetailView):
     model = Profile
     template_name = 'user/profile.html'
@@ -35,7 +34,21 @@ class ProfileDetailView(LoginRequiredMixin, generic.DetailView):
             return redirect(reverse_lazy('update-profile'))
         return profile
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        profile = context['profile'] 
+        products = Product.objects.filter(user=self.request.user)  
+        total_benefit = 0
 
+        for product in products:
+            if product.sold > 0 and product.price:  
+                total_benefit += (product.price - product.cost_price) * product.sold 
+
+        context['total_benefit'] = total_benefit
+        context['profile'] = profile  
+        return context
+
+    
 def create_or_edit_profile(request, pk=None):
     if pk:
         profile = get_object_or_404(Profile, pk=pk, user=request.user)
