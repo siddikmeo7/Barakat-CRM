@@ -11,7 +11,7 @@ from datetime import date
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .models import Profile
-
+# Dashborad
 @login_required
 def dashboard(request):
     user = request.user
@@ -27,7 +27,7 @@ def dashboard(request):
         'profile_completion': round(profile_completion, 2),
         'profile': profile
     })
-
+# Home
 class HomeView(generic.TemplateView):
     template_name = 'main/home.html'
 
@@ -37,7 +37,7 @@ class HomeView(generic.TemplateView):
 class DashBoardView(generic.TemplateView):
     template_name = 'main/dashboard.html'
 
-    
+# Profile
 class ProfileCreateView(generic.CreateView):
     fields = ['bio','profile_picture','website','date_of_birth',]
     template_name = 'profile_form.html'
