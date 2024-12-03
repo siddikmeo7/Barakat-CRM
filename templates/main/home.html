@@ -6,10 +6,6 @@
     <h2>Welcome to Nur CRM - Dear: <span>{{ user.username }}</span></h2>
     <p>Manage your clients, track profits, and automate your business efficiently.</p>
     <a href="{% url 'dashboard' %}" class="btn btn-primary">Go to Dashboard</a>
-
-    <p>Need to log in or create a new account for testing? Use the links below:</p>
-    <a href="/login/" class="btn btn-secondary">Login</a>
-    <a href="/signup/" class="btn btn-secondary">Signup</a>
 {% else %}
     <h2>Welcome to Nur CRM</h2>
     <p>You are not authenticated! Please log in or sign up to access the system.</p>
