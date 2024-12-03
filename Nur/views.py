@@ -3,8 +3,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.views import generic
 from django.urls import reverse_lazy
+from django.contrib.auth.decorators import login_required
 from .forms import *
 from .models import *
+from django.db.models import Q
 
 
 class HomeView(generic.TemplateView):
@@ -127,35 +129,83 @@ class CityDeleteView(generic.DeleteView):
 
 
 # Product Views
+from django.db.models import Q
+from django.shortcuts import render
+from django.views import generic
+from .models import Product, Category
+
 class ProductListView(generic.ListView):
     model = Product
     template_name = 'products/products.html'
+    context_object_name = 'products'
 
     def get_queryset(self):
-        return Product.objects.filter(user=self.request.user, is_active=True)
+        queryset = Product.objects.filter(user=self.request.user, is_active=True)
+        search_query = self.request.GET.get('q', '')
+        if search_query:
+            queryset = queryset.filter(
+                Q(title__icontains=search_query) | Q(index__icontains=search_query)
+            )
+
+        category_id = self.request.GET.get('category')
+        if category_id:
+            queryset = queryset.filter(category__id=category_id)
+
+        sort_by_date = self.request.GET.get('sort_by_date', '')
+        if sort_by_date == 'asc':
+            queryset = queryset.order_by('sold')  
+        elif sort_by_date == 'desc':
+            queryset = queryset.order_by('-sold')  
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all() 
+        return context
 
 class ProductDetailView(generic.DetailView):
     model = Product
-    template_name = 'product_detail.html'
+    template_name = 'products/product_detail.html'
     context_object_name = 'product'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        product = context['product']
+        if hasattr(product, 'cost_price'):
+            benefit = (product.price - product.cost_price) * product.sold
+        else:
+            benefit = 0 
+        context['benefit'] = benefit
+        return context
 
+@login_required 
 def product_create(request):
     if request.method == "POST":
         form = ProductForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('product-list') 
+            product = form.save(commit=False)
+            product.user = request.user 
+            product.save()
+            return redirect('product-list')
     else:
         form = ProductForm()
     return render(request, 'products/product_form.html', {'form': form})
 
+from django.shortcuts import render, get_object_or_404
+from .models import Product
+from .forms import ProductForm
 
-class ProductUpdateView(generic.UpdateView):
-    model = Product
-    fields = ['name', 'category', 'price', 'colour']
-    template_name = 'product_form.html'
-    success_url = reverse_lazy('product-list')
+def product_update_view(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+    if request.method == 'POST':
+        form = ProductForm(request.POST, instance=product)
+        if form.is_valid():
+            form.save()
+            return redirect('product-list')
+    else:
+        form = ProductForm(instance=product)
+    return render(request, 'products/product_form.html', {'form': form, 'product': product})
 
 
 class ProductDeleteView(generic.DeleteView):
@@ -294,3 +344,38 @@ class SkladProductDeleteView(generic.DeleteView):
     model = SkladProduct
     template_name = 'sklad_product_confirm_delete.html'
     success_url = reverse_lazy('sklad-product-list')
+
+class ClientListView(generic.ListView):
+    model = Client
+    template_name = "clients/clients.html"
+    context_object_name = "clients"
+
+    def get_queryset(self):
+        return Client.objects.filter(user=self.request.user)
+    
+class ClientDetailView(generic.DetailView):
+    model = Client
+    template_name = "clients/client_detail.html"
+    context_object_name = "client"
+    
+class ClientCreateView(generic.CreateView):
+    model = Client
+    template_name = "clients/client_form.html"
+    fields = ['name', 'phone_number', 'email', 'address']
+    success_url = reverse_lazy('client-list')
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user 
+        form.instance.balance = 0  
+        return super().form_valid(form)
+    
+class ClientUpdateView(generic.UpdateView):
+    model = Client
+    template_name = "clients/client_form.html"
+    fields = ['name', 'phone_number', 'email', 'address']
+    success_url = reverse_lazy('client-list')
+
+class ClientDeleteView(generic.DeleteView):
+    model = Client
+    template_name = "clients/conf_delete_client.html"
+    success_url = reverse_lazy('client-list')

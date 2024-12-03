@@ -11,7 +11,7 @@
                     {% if form.profile_picture.value %}
                         <img src="{{ form.profile_picture.value.url }}" alt="Profile Picture" />
                     {% else %}
-                        <p>No Prifile Image!</p>
+                        <p>No Profile Image!</p>
                     {% endif %}
                 </div>
                 <div class="card-body">
@@ -43,6 +43,12 @@
                             Your profile is incomplete. <a href="{% url 'update-profile' pk=request.user.profile.pk %}" class="btn btn-primary">Edit Profile</a>
                         </div>
                     {% endif %}
+                    
+                    <!-- Logout Button -->
+                    <form action="{% url 'logout' %}" method="post" class="mt-4">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Logout</button>
+                    </form>
                 </div>
             </div>
         </div>

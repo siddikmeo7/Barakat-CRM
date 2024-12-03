@@ -6,17 +6,67 @@
     <div class="container my-4">
         <h1 class="mb-4">Products</h1>
 
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card p-3">
+                    <h5 class="card-title">Search Products</h5>
+                    <form method="GET" action="" class="form-inline">
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-sm" name="q" value="{{ request.GET.q }}" placeholder="Search by title or index" aria-label="Search products">
+                            <button class="btn btn-primary btn-sm" type="submit">Search</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
-        <a href="{% url 'product-create' %}" class="btn btn-primary mb-4">Add Product</a>
+            <div class="col-md-4">
+                <div class="card p-3">
+                    <h5 class="card-title">Filter by Category</h5>
+                    <form method="GET" action="" class="form-inline">
+                        <select name="category" id="category" class="form-control form-control-sm" onchange="this.form.submit()">
+                            <option value="">-- Select Category --</option>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card p-3">
+                    <h5 class="card-title">Sort by Sold Date</h5>
+                    <form method="GET" action="" class="form-inline">
+                        <select name="sort_by_date" id="sort_by_date" class="form-control form-control-sm" onchange="this.form.submit()">
+                            <option value="">-- Select Sorting --</option>
+                            <option value="asc" {% if request.GET.sort_by_date == "asc" %}selected{% endif %}>Ascending</option>
+                            <option value="desc" {% if request.GET.sort_by_date == "desc" %}selected{% endif %}>Descending</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Product Button -->
+        <div class="row mb-4">
+            <div class="col-md-12 text-end">
+                <a href="{% url 'product-create' %}" class="btn btn-success btn-sm">Add Product</a>
+            </div>
+        </div>
 
         <div class="row">
             {% for product in products %}
-                <div class="col-md-4">
-                    <div class="product-card">
-                        <h5 class="product-title">{{ product.title }}</h5>
-                        <p class="product-category">{{ product.category.name }}</p>
-                        <p class="product-price">${{ product.price }}</p>
-                        <p class="product-stock">Stock: {{ product.up_to }} available</p>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{% url 'product-detail' product.id %}" class="text-decoration-none">
+                                    {{ product.title }}
+                                </a>
+                            </h5>
+                            <p class="card-text">Price: ${{ product.price }}</p>
+                            <p class="card-text">Stock: {{ product.up_to }} available</p>
+                        </div>
                     </div>
                 </div>
             {% empty %}

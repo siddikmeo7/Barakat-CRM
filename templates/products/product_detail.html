@@ -1,0 +1,52 @@
+{% extends "main/base.html" %}
+
+{% block title %}{{ product.title }}{% endblock %}
+
+{% block content %}
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm border-0 rounded">
+                    <div class="card-header bg-dark text-white text-center">
+                        <h3 class="mb-0">{{ product.title }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <p><strong>Title:</strong> {{ product.title }}</p>
+                                <p><strong>Index:</strong> {{ product.index }}</p>
+                                <p><strong>Category:</strong> {{ product.category.name }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Colour:</strong> {{ product.colour }}</p>
+                                <p><strong>Price:</strong> <span class="text-success fs-5">${{ product.price }}</span></p>
+                                <p><strong>Stock:</strong> <span class="badge bg-info">{{ product.up_to }} available</span></p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <p><strong>Sold:</strong> <span class="text-muted">{{ product.sold }}</span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Benefit (Profit):</strong> <span class="text-warning fs-5">${{ benefit }}</span></p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'product-update' product.id %}" class="btn btn-warning w-45">Update</a>
+                            <form action="{% url 'product-delete' product.id %}" method="post" class="w-45">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger w-100">Delete</button>
+                            </form>
+                        </div>
+
+                        <div class="mt-4 text-center">
+                            <a href="{% url 'product-list' %}" class="btn btn-outline-dark btn-lg">Back to Products</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
