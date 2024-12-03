@@ -1,0 +1,21 @@
+{% extends "main/base.html" %}
+{% block title %}Client Detail{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="mb-4">Client Details</h2>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h4 class="card-title">{{ client.name }}</h4>
+            <p class="card-text"><strong>Phone:</strong> {{ client.phone_number }}</p>
+            <p class="card-text"><strong>Email:</strong> {{ client.email }}</p>
+            <p class="card-text"><strong>Address:</strong> {{ client.address }}</p>
+        </div>
+        <div class="card-footer text-end">
+            <a href="{% url 'client-update' client.id %}" class="btn btn-warning btn-sm">Edit</a>
+            <a href="{% url 'client-delete' client.id %}" class="btn btn-danger btn-sm">Delete</a>
+            <a href="{% url 'client-list' %}" class="btn btn-secondary btn-sm">Back to Clients</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

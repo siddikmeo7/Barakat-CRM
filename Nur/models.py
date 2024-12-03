@@ -28,6 +28,23 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return f"{self.username} : {self.email}"
     
+from django.db import models
+
+class Client(models.Model):
+    user = models.ForeignKey("Nur.CustomUser", on_delete=models.CASCADE, related_name="clients")
+    name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    phone_number = models.CharField(max_length=20, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    address = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+    balance = models.DecimalField(max_digits=15, decimal_places=2,default=0)
+    
+    def __str__(self):
+        return self.name
+
 class Profile(models.Model):
     user = models.OneToOneField(
         'Nur.CustomUser', on_delete=models.CASCADE, related_name="profile"
@@ -105,3 +122,17 @@ class SkladProduct(models.Model):
 
     def __str__(self):
         return f"{self.sklad.name} - {self.product.title or 'Unnamed Product'}"
+    
+class Order(models.Model):
+    user = models.ForeignKey("Nur.CustomUser", on_delete=models.CASCADE)
+    client = models.ForeignKey("Nur.Client", on_delete=models.CASCADE, related_name="orders")
+    product = models.ForeignKey("Nur.Product", on_delete=models.CASCADE, related_name="orders")
+    quantity = models.PositiveIntegerField(default=0)
+    price_at_purchase = models.DecimalField(max_digits=15, decimal_places=2)
+    total_price = models.DecimalField(max_digits=15, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=50, choices=[('pending', 'Pending'), ('completed', 'Completed'), ('cancelled', 'Cancelled')])
+
+    def __str__(self):
+        return f"Order #{self.id} - {self.client.name}"
+

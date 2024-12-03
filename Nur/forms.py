@@ -52,7 +52,7 @@ from .models import Product
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['title', 'category', 'price', 'up_to']
+        fields = ['title', 'index', 'category', 'colour', 'price', 'up_to', 'sold', ]
 
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     category = forms.ModelChoiceField(queryset=Category.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))

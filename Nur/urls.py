@@ -29,7 +29,7 @@ urlpatterns = [
     path('products/', ProductListView.as_view(), name='product-list'),
     path('product/<int:pk>/', ProductDetailView.as_view(), name='product-detail'),
     path('product/create/', product_create, name='product-create'),
-    path('product/update/<int:pk>/', ProductUpdateView.as_view(), name='product-update'),
+    path('product/update/<int:pk>/', product_update_view, name='product-update'),
     path('product/delete/<int:pk>/', ProductDeleteView.as_view(), name='product-delete'),
 
     # Category
@@ -59,4 +59,11 @@ urlpatterns = [
     path('sklad-product/create/', SkladProductCreateView.as_view(), name='sklad-product-create'),
     path('sklad-product/update/<int:pk>/', SkladProductUpdateView.as_view(), name='sklad-product-update'),
     path('sklad-product/delete/<int:pk>/', SkladProductDeleteView.as_view(), name='sklad-product-delete'),
+    
+    # Clients
+    path('clients/', ClientListView.as_view(), name='client-list'),
+    path('clients/<int:pk>/', ClientDetailView.as_view(), name='client-detail'),
+    path('clients/create/', ClientCreateView.as_view(), name='client-create'),
+    path('clients/<int:pk>/edit/', ClientUpdateView.as_view(), name='client-update'),
+    path('clients/<int:pk>/delete/', ClientDeleteView.as_view(), name='client-delete'),
 ]
