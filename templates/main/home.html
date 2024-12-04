@@ -1,16 +1,159 @@
 {% extends 'main/base.html' %}
 {% block title %}Home - Nur CRM{% endblock %}
 {% block content %}
+<style>
 
-{% if user.is_authenticated %}
-    <h2>Welcome to Nur CRM - Dear: <span>{{ user.username }}</span></h2>
-    <p>Manage your clients, track profits, and automate your business efficiently.</p>
-    <a href="{% url 'dashboard' %}" class="btn btn-primary">Go to Dashboard</a>
-{% else %}
-    <h2>Welcome to Nur CRM</h2>
-    <p>You are not authenticated! Please log in or sign up to access the system.</p>
-    <a href="/login/" class="btn btn-primary">Login</a>
-    <a href="/signup/" class="btn btn-secondary">Signup</a>
-{% endif %}
+.hero-section {
+    background: linear-gradient(135deg, #007bff, #00d2ff);
+    color: white;
+    padding: 60px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.hero-section h2 {
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+.hero-section p {
+    font-size: 1.25rem;
+    margin-bottom: 30px;
+}
+
+.hero-section .btn {
+    font-size: 1.1rem;
+    padding: 12px 30px;
+}
+
+/* Features Section */
+.features-section {
+    background-color: #f7f7f7;
+    padding: 60px 0;
+}
+
+.features-section .feature-box {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+}
+
+.features-section .feature-box:hover {
+    transform: translateY(-10px);
+}
+
+.features-section h3 {
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+}
+
+.features-section h4 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.features-section p {
+    font-size: 1.1rem;
+}
+
+/* Call to Action Section */
+.cta-section {
+    background-color: #333;
+    padding: 60px 20px;
+    color: white;
+}
+
+.cta-section h3 {
+    font-size: 3.5rem;
+    font-weight: 700;
+}
+
+.cta-section p {
+    font-size: 1.25rem;
+    margin-bottom: 30px;
+}
+
+.cta-section .btn {
+    font-size: 1.25rem;
+    padding: 12px 30px;
+}
+
+/* Button Styles */
+.btn-lg {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+}
+
+.btn-outline-light {
+    border: 2px solid #ffffff;
+    color: #ffffff;
+}
+
+.btn-outline-light:hover {
+    background-color: #ffffff;
+    color: #333;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+    border-color: #e0a800;
+}
+
+</style>
+<!-- Hero Section -->
+<section class="hero-section text-center bg-primary text-white py-5">
+    <h2 class="display-4">Welcome to Nur CRM</h2>
+    <p class="lead">Manage your clients, track profits, and automate your business efficiently.</p>
+    {% if user.is_authenticated %}
+        <h3>Dear: <span class="text-warning">{{ user.username }}</span></h3>
+        <p class="mb-4">Stay on top of your business with ease.</p>
+        <a href="{% url 'dashboard' %}" class="btn btn-light btn-lg">Go to Dashboard</a>
+    {% else %}
+        <p>You are not authenticated! Please log in or sign up to access the system.</p>
+        <a href="/login/" class="btn btn-light btn-lg mr-3">Login</a>
+        <a href="/signup/" class="btn btn-outline-light btn-lg">Signup</a>
+    {% endif %}
+</section>
+
+<!-- Features Section -->
+<section class="features-section py-5">
+    <div class="container text-center">
+        <h3 class="mb-4">Why Choose Nur CRM?</h3>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="feature-box p-4 shadow-sm rounded">
+                    <h4>Client Management</h4>
+                    <p>Manage all your clients in one place with easy access to important data.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box p-4 shadow-sm rounded">
+                    <h4>Profit Tracking</h4>
+                    <p>Track your profits and expenses automatically with our real-time analytics.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box p-4 shadow-sm rounded">
+                    <h4>Business Automation</h4>
+                    <p>Save time with automated reports, notifications, and reminders.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="cta-section text-center bg-dark text-white py-5">
+    <h3 class="display-4 mb-4">Start Growing Your Business Today!</h3>
+    <p class="lead mb-4">Sign up for a free trial and take the first step towards streamlining your business operations.</p>
+    <a href="/signup/" class="btn btn-warning btn-lg">Sign Up Now</a>
+</section>
 
 {% endblock %}

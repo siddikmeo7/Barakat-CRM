@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import *
-
+# User
 class UserSignupForm(forms.ModelForm):
     country = forms.ModelChoiceField(queryset=Country.objects.all(), empty_label="Select a country")
     city = forms.ModelChoiceField(queryset=City.objects.none(), empty_label="Select a city")
@@ -38,7 +38,7 @@ class CustomUserForm(UserCreationForm):
         
         return cleaned_data
 
-    
+# Profile  
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
@@ -49,6 +49,7 @@ class ProfileForm(forms.ModelForm):
 from django import forms
 from .models import Product
 
+# Products
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
@@ -60,4 +61,14 @@ class ProductForm(forms.ModelForm):
     cost_price = forms.DecimalField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
     sold = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
     up_to = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
+
+# Transaction Form 
+from django import forms
+from .models import Transaction
+
+class TransactionForm(forms.ModelForm):
+    class Meta:
+        model = Transaction
+        fields = ['client', 'transaction_type', 'amount', 'comments']
+
 

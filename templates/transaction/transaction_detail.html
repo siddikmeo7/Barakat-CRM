@@ -1,0 +1,20 @@
+{% extends "main/base.html" %}
+
+{% block title %}Transaction Detail{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2 class="my-4">Transaction Details</h2>
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title">Transaction ID: {{ transaction.transaction_id }}</h3>
+                <p><strong>Client:</strong> {{ transaction.client.name }}</p>
+                <p><strong>Transaction Type:</strong> {{ transaction.transaction_type }}</p>
+                <p><strong>Amount:</strong> {{ transaction.amount }}</p>
+                <p><strong>Comments:</strong> {{ transaction.comments }}</p>
+                <p><strong>Created At:</strong> {{ transaction.created_at }}</p>
+            </div>
+        </div>
+        <a href="{% url 'transaction-list' %}" class="btn btn-secondary my-3">Back to Transactions</a>
+    </div>
+{% endblock %}

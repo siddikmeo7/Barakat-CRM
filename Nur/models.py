@@ -1,5 +1,8 @@
+import uuid
 from django.db import models
+from django.dispatch import receiver
 from django.utils.timezone import now
+from django.db.models.signals import post_save
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, RegexValidator
@@ -137,4 +140,32 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order #{self.id} - {self.client.name}"
+
+# Transaction of Clients  Loan/Paid
+class Transaction(models.Model):
+    TRANSACTION_TYPES = [
+        ('loan', 'Loan'),
+        ('repay', 'Repay'),
+    ]
+    user = models.ForeignKey("Nur.CustomUser", on_delete=models.CASCADE)
+    client = models.ForeignKey("Nur.Client", on_delete=models.CASCADE)
+    transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPES)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    comments = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+@receiver(post_save, sender=Transaction)
+def update_client_balance(sender, instance, created, **kwargs):
+    if created:  
+        client = instance.client
+        if instance.transaction_type == 'loan':
+            client.balance += instance.amount
+        elif instance.transaction_type == 'repay':
+            client.balance -= instance.amount
+        client.save()
+
+    def __str__(self):
+        return f"{self.client.name} - {self.transaction_type} - {self.amount}"
+
+# Automatically update the client's balance after a transaction is saved
 

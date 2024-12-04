@@ -7,6 +7,11 @@ class CustomUserAdmin(admin.ModelAdmin):
     list_filter = ['country', 'city', 'address']
     search_fields = ['username', 'email', 'phone_number', 'address']
 
+@admin.register(Transaction)
+class TransactionAdmin(admin.ModelAdmin):
+    list_display = ('client', 'transaction_type', 'amount', 'created_at', 'user')
+    list_filter = ('transaction_type', 'created_at')
+    search_fields = ('client__name', 'user__username', 'comments')
 
 @admin.register(Country)
 class CountryAdmin(admin.ModelAdmin):

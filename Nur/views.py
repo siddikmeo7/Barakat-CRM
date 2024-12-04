@@ -4,50 +4,68 @@ from django.http import Http404
 from django.views import generic
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum, F, ExpressionWrapper, DecimalField
 from .forms import *
 from .models import *
 from django.db.models import Q
-from datetime import date
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from .models import Profile
-# Dashborad
-@login_required
-def dashboard(request):
-    user = request.user
-    profile = user.profile  
-    profile_fields = ['bio', 'date_of_birth', 'profile_picture', 'website']
-    
-    completed_fields = sum([bool(getattr(profile, field)) for field in profile_fields])
-    total_fields = len(profile_fields)
-    profile_completion = (completed_fields / total_fields) * 100
 
-    return render(request, 'dashboard.html', {
-        'user': user,
-        'profile_completion': round(profile_completion, 2),
-        'profile': profile
-    })
 
-# Home
 class HomeView(generic.TemplateView):
     template_name = 'main/home.html'
 
     def get_queryset(self):
         return Profile.objects.filter(active=True)
-    
+
 class DashBoardView(generic.TemplateView):
     template_name = 'main/dashboard.html'
 
-# Profile
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Get all active products
+        products = Product.objects.filter(is_active=True)
+        
+        # Calculate total products in stock
+        total_products_in_stock = products.aggregate(total_stock=Sum(F('up_to') - F('sold')))['total_stock']
+        
+        # Get count of out-of-stock products
+        out_of_stock_products = products.filter(up_to=0).count()
+
+        # Get the total number of clients
+        total_clients = Client.objects.count()  # Assuming you have a Client model
+        
+        # Calculate total benefit (profit) from all sold products
+        profit_per_product = ExpressionWrapper(
+            (F('price') - F('cost_price')) * F('sold'),
+            output_field=DecimalField()
+        )
+        total_benefit = products.aggregate(total_benefit=Sum(profit_per_product))['total_benefit']
+
+        # Calculate total number of products sold (sum of 'sold' field for all products)
+        total_sold_products = products.aggregate(
+            total_sold=Sum('sold')
+        )['total_sold']
+
+        # Update the "Orders this month" field to show the correct number of products sold
+        # Assuming you have a way to track monthly sales, if not, this will show total sold products
+        orders_this_month = total_sold_products  # This should reflect the total sold quantity in this month
+
+        context['total_products_in_stock'] = total_products_in_stock
+        context['out_of_stock_products'] = out_of_stock_products
+        context['total_clients'] = total_clients  # Add total clients count to the context
+        context['total_benefit'] = total_benefit  # Add total benefit to the context
+        context['total_sold_products'] = total_sold_products  # Add total sold products to the context
+        context['orders_this_month'] = orders_this_month  # Add orders this month to the context
+
+        return context
+
+
+  
 class ProfileCreateView(generic.CreateView):
     fields = ['bio','profile_picture','website','date_of_birth',]
     template_name = 'profile_form.html'
     success_url = reverse_lazy('home')
 
-def product_detail(request, product_id):
-    product = Product.objects.get(id=product_id)
-    benefit = (product.price - product.cost_price) * product.sold
-    return render(request, 'product_detail.html', {'product': product, 'benefit': benefit})
 class ProfileDetailView(LoginRequiredMixin, generic.DetailView):
     model = Profile
     template_name = 'user/profile.html'
@@ -60,23 +78,9 @@ class ProfileDetailView(LoginRequiredMixin, generic.DetailView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         profile = context['profile'] 
         products = Product.objects.filter(user=self.request.user)  
         total_benefit = 0
-
-        profile = context['profile']  
-        products = Product.objects.filter(user=self.request.user) 
-        total_benefit = 0
-        for product in products:
-            if product.sold > 0 and product.price: 
-                total_benefit += (product.price - product.cost_price) * product.sold 
-
-        context['total_benefit'] = total_benefit
-        context['profile'] = profile 
-        return context
-
-
 
         for product in products:
             if product.sold > 0 and product.price:  
@@ -85,6 +89,7 @@ class ProfileDetailView(LoginRequiredMixin, generic.DetailView):
         context['total_benefit'] = total_benefit
         context['profile'] = profile  
         return context
+
     
 def create_or_edit_profile(request, pk=None):
     if pk:
@@ -105,16 +110,19 @@ def create_or_edit_profile(request, pk=None):
         form = ProfileForm(instance=profile) if profile else ProfileForm()
     return render(request, 'user/profile_form.html', {'form': form})
 
+
 class ProfileDeleteView(generic.DeleteView):
     model = Profile
     template_name = 'profile_confirm_delete.html'
     success_url = reverse_lazy('home')
+
 
 # Country Views
 class CountryListView(generic.ListView):
     model = Country
     template_name = 'country_list.html'
     context_object_name = 'countries'
+
 
 class CountryDetailView(generic.DetailView):
     model = Country
@@ -127,6 +135,7 @@ class CountryCreateView(generic.CreateView):
     fields = ['name']
     template_name = 'country_form.html'
     success_url = reverse_lazy('country-list')
+
 
 class CountryUpdateView(generic.UpdateView):
     model = Country
@@ -175,11 +184,6 @@ class CityDeleteView(generic.DeleteView):
 
 
 # Product Views
-from django.db.models import Q
-from django.shortcuts import render
-from django.views import generic
-from .models import Product, Category
-
 class ProductListView(generic.ListView):
     model = Product
     template_name = 'products/products.html'
@@ -210,10 +214,6 @@ class ProductListView(generic.ListView):
         context['categories'] = Category.objects.all() 
         return context
 
-from django.shortcuts import render
-from django.views import generic
-from .models import Product
-
 class ProductDetailView(generic.DetailView):
     model = Product
     template_name = 'products/product_detail.html'
@@ -222,16 +222,11 @@ class ProductDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         product = context['product']
-
-        if product.sold > 0 and product.price and product.cost_price:
-            profit_per_product = product.price - product.cost_price
-            total_profit = profit_per_product * product.sold
+        if hasattr(product, 'cost_price'):
+            benefit = (product.price - product.cost_price) * product.sold
         else:
-            profit_per_product = 0
-            total_profit = 0
-        
-        context['profit_per_product'] = profit_per_product
-        context['total_profit'] = total_profit
+            benefit = 0 
+        context['benefit'] = benefit
         return context
 
 @login_required 
@@ -247,18 +242,24 @@ def product_create(request):
         form = ProductForm()
     return render(request, 'products/product_form.html', {'form': form})
 
+from django.shortcuts import render, get_object_or_404
+from .models import Product
+from .forms import ProductForm
 
 def product_update_view(request, pk):
     product = get_object_or_404(Product, pk=pk)
-    if request.method == 'POST':
+
+    if request.method == 'POST' or request.POST.get('_method') == 'PUT': 
         form = ProductForm(request.POST, instance=product)
         if form.is_valid():
             form.save()
-            return redirect('product-list')
+            return redirect('product-list') 
+        else:
+            return render(request, 'products/product_form.html', {'form': form, 'product': product})
+    
     else:
-        form = ProductForm(instance=product)
+        form = ProductForm(instance=product)  
     return render(request, 'products/product_form.html', {'form': form, 'product': product})
-
 
 class ProductDeleteView(generic.DeleteView):
     model = Product
@@ -409,7 +410,13 @@ class ClientDetailView(generic.DetailView):
     model = Client
     template_name = "clients/client_detail.html"
     context_object_name = "client"
-    
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        client = self.get_object()
+        context['transactions'] = client.transaction_set.all()
+        return context
+
 class ClientCreateView(generic.CreateView):
     model = Client
     template_name = "clients/client_form.html"
@@ -431,3 +438,77 @@ class ClientDeleteView(generic.DeleteView):
     model = Client
     template_name = "clients/conf_delete_client.html"
     success_url = reverse_lazy('client-list')
+
+# Transaction Part for Client
+class TransactionListView(generic.ListView):
+    model = Transaction
+    template_name = 'transactions/transaction_list.html'
+    context_object_name = 'transactions'
+
+    def get_queryset(self):
+        return Transaction.objects.filter(client__user=self.request.user)
+
+class TransactionDetailView(generic.DetailView):
+    model = Transaction
+    template_name = 'transactions/transaction_detail.html'
+    context_object_name = 'transaction'
+
+from django.contrib import messages
+
+class TransactionCreateView(generic.CreateView):
+    model = Transaction
+    fields = ['transaction_type', 'amount', 'comments']
+    template_name = 'transaction/transaction_form.html'
+
+    def form_valid(self, form):
+        client = get_object_or_404(Client, pk=self.kwargs['client_id'])
+        
+        # Create the transaction object but don't save it yet
+        transaction = form.save(commit=False)
+        transaction.client = client
+        transaction.user = self.request.user  
+    
+        # Ensure amount is a valid number and the transaction type is correct
+        print(f"Transaction Amount: {transaction.amount}")
+        print(f"Transaction Type: {transaction.transaction_type}")
+    
+        # Check the balance before transaction
+        print(f"Balance before transaction: {client.balance}")
+        
+        # Update balance based on the transaction type
+        if transaction.transaction_type == 'loan':
+            client.balance += transaction.amount  # Adding loan amount
+        elif transaction.transaction_type == 'repay':
+            client.balance -= transaction.amount  # Subtracting repayment amount
+        
+        # Check balance after transaction update
+        print(f"Balance after transaction: {client.balance}")
+        
+        # Save the updated client balance and the transaction
+        client.save()
+        transaction.save()
+    
+        # Refresh the client object to get the updated balance from the database
+        client.refresh_from_db()
+    
+        print(f"Final Balance after transaction save: {client.balance}")
+    
+        # Show a success message and redirect
+        messages.success(self.request, f'Transaction for {client.name} successfully created!')
+        return redirect('client-detail', pk=client.id)
+ 
+
+    
+class TransactionUpdateView(generic.UpdateView):
+    model = Transaction
+    template_name = 'transactions/transaction_form.html'
+    form_class = TransactionForm
+
+    def get_success_url(self):
+        return reverse_lazy('transaction-list')
+
+
+class TransactionDeleteView(generic.DeleteView):
+    model = Transaction
+    template_name = 'transactions/transaction_confirm_delete.html'
+    success_url = reverse_lazy('transaction-list')
