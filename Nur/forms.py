@@ -62,3 +62,13 @@ class ProductForm(forms.ModelForm):
     sold = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
     up_to = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
 
+# Transaction Form 
+from django import forms
+from .models import Transaction
+
+class TransactionForm(forms.ModelForm):
+    class Meta:
+        model = Transaction
+        fields = ['client', 'transaction_type', 'amount', 'comments']
+
+

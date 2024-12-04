@@ -66,4 +66,11 @@ urlpatterns = [
     path('clients/create/', ClientCreateView.as_view(), name='client-create'),
     path('clients/<int:pk>/edit/', ClientUpdateView.as_view(), name='client-update'),
     path('clients/<int:pk>/delete/', ClientDeleteView.as_view(), name='client-delete'),
+
+    # Transactions for Clients 
+    path('transactions/', TransactionListView.as_view(), name='transaction-list'),
+    path('transactions/create/<int:client_id>/', TransactionCreateView.as_view(), name='transaction-create'),
+    path('transactions/<int:pk>/', TransactionDetailView.as_view(), name='transaction-detail'),
+    path('transactions/<int:pk>/update/', TransactionUpdateView.as_view(), name='transaction-update'),
+    path('transactions/<int:pk>/delete/', TransactionDeleteView.as_view(), name='transaction-delete'),
 ]

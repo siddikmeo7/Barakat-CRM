@@ -7,7 +7,19 @@
     <title>{% block title %}Nur CRM{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        /* Ensure navbar stays fixed at the top with reduced height */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 9999;  /* Keep the navbar on top of other content */
+            padding: 0.5rem 1rem;  /* Reduce padding for smaller navbar height */
+        }
+
+        /* Add padding to the body so that content does not overlap the navbar */
         body {
+            padding-top: 56px;  /* Adjust padding based on the new height of the navbar */
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -22,8 +34,8 @@
         }
 
         .profile-avatar {
-            width: 40px;
-            height: 40px;
+            width: 35px;
+            height: 35px;
             object-fit: cover;
         }
     </style>
