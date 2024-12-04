@@ -3,27 +3,31 @@
 {% block title %}Products{% endblock %}
 
 {% block content %}
-    <div class="container my-4">
-        <h1 class="mb-4">Products</h1>
+<div class="container my-4">
+    <h1 class="mb-4 text-center">Products</h1>
 
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="card p-3">
+    <!-- Filters Section -->
+    <div class="row g-3 mb-4">
+        <!-- Search Products -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
                     <h5 class="card-title">Search Products</h5>
-                    <form method="GET" action="" class="form-inline">
-                        <div class="input-group">
-                            <input type="text" class="form-control form-control-sm" name="q" value="{{ request.GET.q }}" placeholder="Search by title or index" aria-label="Search products">
-                            <button class="btn btn-primary btn-sm" type="submit">Search</button>
-                        </div>
+                    <form method="GET" action="" class="d-flex">
+                        <input type="text" class="form-control me-2" name="q" value="{{ request.GET.q }}" placeholder="Search by title or index">
+                        <button class="btn btn-primary" type="submit">Search</button>
                     </form>
                 </div>
             </div>
+        </div>
 
-            <div class="col-md-4">
-                <div class="card p-3">
+        <!-- Filter by Category -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
                     <h5 class="card-title">Filter by Category</h5>
-                    <form method="GET" action="" class="form-inline">
-                        <select name="category" id="category" class="form-control form-control-sm" onchange="this.form.submit()">
+                    <form method="GET" action="">
+                        <select name="category" id="category" class="form-select" onchange="this.form.submit()">
                             <option value="">-- Select Category --</option>
                             {% for category in categories %}
                                 <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
@@ -32,12 +36,15 @@
                     </form>
                 </div>
             </div>
+        </div>
 
-            <div class="col-md-4">
-                <div class="card p-3">
+        <!-- Sort by Sold Date -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
                     <h5 class="card-title">Sort by Sold Date</h5>
-                    <form method="GET" action="" class="form-inline">
-                        <select name="sort_by_date" id="sort_by_date" class="form-control form-control-sm" onchange="this.form.submit()">
+                    <form method="GET" action="">
+                        <select name="sort_by_date" id="sort_by_date" class="form-select" onchange="this.form.submit()">
                             <option value="">-- Select Sorting --</option>
                             <option value="asc" {% if request.GET.sort_by_date == "asc" %}selected{% endif %}>Ascending</option>
                             <option value="desc" {% if request.GET.sort_by_date == "desc" %}selected{% endif %}>Descending</option>
@@ -46,32 +53,48 @@
                 </div>
             </div>
         </div>
-
-        <!-- Add Product Button -->
-        <div class="row mb-4">
-            <div class="col-md-12 text-end">
-                <a href="{% url 'product-create' %}" class="btn btn-success btn-sm">Add Product</a>
-            </div>
-        </div>
-
-        <div class="row">
-            {% for product in products %}
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="{% url 'product-detail' product.id %}" class="text-decoration-none">
-                                    {{ product.title }}
-                                </a>
-                            </h5>
-                            <p class="card-text">Price: ${{ product.price }}</p>
-                            <p class="card-text">Stock: {{ product.up_to }} available</p>
-                        </div>
-                    </div>
-                </div>
-            {% empty %}
-                <p>No products available.</p>
-            {% endfor %}
-        </div>
     </div>
+
+    <!-- Add Product Button -->
+    <div class="text-end mb-4">
+        <a href="{% url 'product-create' %}" class="btn btn-success">+ Add Product</a>
+    </div>
+
+    <!-- Product List -->
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Product Title</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Stock</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>
+                            <a href="{% url 'product-detail' product.id %}" class="text-decoration-none text-dark">
+                                {{ product.title }}
+                            </a>
+                        </td>
+                        <td>${{ product.price }}</td>
+                        <td>{{ product.up_to }}</td>
+                        <td class="text-center">
+                            <a href="{% url 'product-detail' product.id %}" class="btn btn-outline-primary btn-sm me-2">View</a>
+                            <a href="#" class="btn btn-outline-warning btn-sm me-2">Edit</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">No products available.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

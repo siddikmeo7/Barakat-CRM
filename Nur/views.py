@@ -27,6 +27,7 @@ def dashboard(request):
         'profile_completion': round(profile_completion, 2),
         'profile': profile
     })
+
 # Home
 class HomeView(generic.TemplateView):
     template_name = 'main/home.html'
