@@ -80,3 +80,5 @@ class CustomPasswordResetCompleteView(DjangoPasswordResetCompleteView):
     template_name = 'registration/password_reset_complete.html'
 
 
+
+
