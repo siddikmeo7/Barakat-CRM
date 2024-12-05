@@ -1,11 +1,14 @@
 from django.shortcuts import get_object_or_404, redirect,render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
+from django.contrib import messages
 from django.views import generic
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.conf import settings
+from datetime import datetime
+from django.db.models import Sum, F, ExpressionWrapper, DecimalField
 from django.db.models import Sum, F, ExpressionWrapper, DecimalField
 from .forms import *
 from .models import *
@@ -18,11 +21,14 @@ class HomeView(generic.TemplateView):
     def get_queryset(self):
         return Profile.objects.filter(active=True)
 
+
+from django.db.models import Sum, F, ExpressionWrapper, DecimalField
+from datetime import datetime
+from .models import Product, Client
+
 from django.db.models import F, Sum, ExpressionWrapper, DecimalField
 from datetime import datetime
-
-from datetime import datetime
-from django.db.models import Sum, F, ExpressionWrapper, DecimalField
+from .models import Product, Client
 
 class DashBoardView(generic.TemplateView):
     template_name = 'main/dashboard.html'
@@ -43,15 +49,20 @@ class DashBoardView(generic.TemplateView):
         )
         total_income = products.aggregate(total_income=Sum(profit_per_product))['total_income'] or 0
         
+        total_benefit = products.aggregate(total_benefit=Sum((F('price') - F('cost_price')) * F('sold')))['total_benefit'] or 0
+        
         total_products_in_stock = products.aggregate(total_stock=Sum(F('up_to') - F('sold')))['total_stock'] or 0
+        
         out_of_stock_products = products.filter(up_to=0).count()
+        
         total_clients = Client.objects.count()
 
         context['total_products_in_stock'] = total_products_in_stock
         context['out_of_stock_products'] = out_of_stock_products
-        context['total_clients'] = total_clients  
+        context['total_clients'] = total_clients
         context['total_income'] = total_income
         context['total_sold_products'] = total_sold_products
+        context['total_benefit'] = total_benefit
 
         return context
 
@@ -216,29 +227,27 @@ class ProductDetailView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         product = context['product']
+        
+        # Calculate benefit as the difference between price and cost price
         if hasattr(product, 'cost_price'):
-            benefit = (product.price - product.cost_price) * product.sold
+            benefit = (product.sold - product.price) 
         else:
-            benefit = 0 
+            benefit = 0
+        
         context['benefit'] = benefit
         return context
 
-@login_required 
-def product_create(request):
-    if request.method == "POST":
-        form = ProductForm(request.POST)
-        if form.is_valid():
-            product = form.save(commit=False)
-            product.user = request.user 
-            product.save()
-            return redirect('product-list')
-    else:
-        form = ProductForm()
-    return render(request, 'products/product_form.html', {'form': form})
 
-from django.shortcuts import render, get_object_or_404
-from .models import Product
-from .forms import ProductForm
+class ProductCreateView(LoginRequiredMixin, generic.CreateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'products/product_form.html'
+    success_url = reverse_lazy('product-list')  
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user  
+        return super().form_valid(form)
+
 
 def product_update_view(request, pk):
     product = get_object_or_404(Product, pk=pk)
@@ -363,33 +372,33 @@ class SkladDeleteView(generic.DeleteView):
 # SkladProduct Views
 class SkladProductListView(generic.ListView):
     model = SkladProduct
-    template_name = 'sklad_product_list.html'
+    template_name = 'skladproduct/sklad_product_list.html'
     context_object_name = 'sklad_products'
 
 
 class SkladProductDetailView(generic.DetailView):
     model = SkladProduct
-    template_name = 'sklad_product_detail.html'
+    template_name = 'skladproduct/sklad_product_detail.html'
     context_object_name = 'sklad_product'
 
 
 class SkladProductCreateView(generic.CreateView):
     model = SkladProduct
     fields = ['sklad', 'product', 'quantity']
-    template_name = 'sklad_product_form.html'
+    template_name = 'skladproduct/sklad_product_form.html'
     success_url = reverse_lazy('sklad-product-list')
 
 
 class SkladProductUpdateView(generic.UpdateView):
     model = SkladProduct
     fields = ['sklad', 'product', 'quantity']
-    template_name = 'sklad_product_form.html'
+    template_name = 'skladproduct/sklad_product_form.html'
     success_url = reverse_lazy('sklad-product-list')
 
 
 class SkladProductDeleteView(generic.DeleteView):
     model = SkladProduct
-    template_name = 'sklad_product_confirm_delete.html'
+    template_name = 'skladproduct/sklad_product_conf_delete.html'
     success_url = reverse_lazy('sklad-product-list')
 
 class ClientListView(generic.ListView):
@@ -446,8 +455,6 @@ class TransactionDetailView(generic.DetailView):
     model = Transaction
     template_name = 'transactions/transaction_detail.html'
     context_object_name = 'transaction'
-
-from django.contrib import messages
 
 class TransactionCreateView(generic.CreateView):
     model = Transaction
