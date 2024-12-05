@@ -1,0 +1,34 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Sklad Products{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h1>Sklad Products</h1>
+        <a href="{% url 'sklad-product-create' %}" class="btn btn-primary mb-3">Add New Product</a>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Sklad</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sklad_product in sklad_products %}
+                    <tr>
+                        <td>{{ sklad_product.product.name }}</td>
+                        <td>{{ sklad_product.quantity }}</td>
+                        <td>{{ sklad_product.sklad.name }}</td>
+                        <td>
+                            <a href="{% url 'sklad-product-detail' sklad_product.id %}" class="btn btn-info">View</a>
+                            <a href="{% url 'sklad-product-update' sklad_product.id %}" class="btn btn-warning">Edit</a>
+                            <a href="{% url 'sklad-product-delete' sklad_product.id %}" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
