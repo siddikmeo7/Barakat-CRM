@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from django.contrib.auth.views import (
     PasswordResetView as DjangoPasswordResetView,
     PasswordResetDoneView as DjangoPasswordResetDoneView,
@@ -79,8 +78,5 @@ class CustomPasswordResetConfirmView(DjangoPasswordResetConfirmView):
 # Password Reset Complete View
 class CustomPasswordResetCompleteView(DjangoPasswordResetCompleteView):
     template_name = 'registration/password_reset_complete.html'
-=======
-from django.shortcuts import render
 
-# Create your views here.
->>>>>>> 9aa85693653fbdaefe6c176d01c65fab7899ae95
+

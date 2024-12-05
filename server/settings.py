@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -133,7 +133,7 @@ USE_SSL = True
 LOGIN_URL = 'login' 
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "login"
-=======
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -247,4 +247,4 @@ STATICFILES_DIRS = [ BASE_DIR / 'static/']
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
->>>>>>> 9aa85693653fbdaefe6c176d01c65fab7899ae95
+
