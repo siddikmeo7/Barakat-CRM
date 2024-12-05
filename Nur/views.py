@@ -4,6 +4,8 @@ from django.http import Http404
 from django.views import generic
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from django.conf import settings
 from django.db.models import Sum, F, ExpressionWrapper, DecimalField
 from .forms import *
 from .models import *
@@ -16,46 +18,43 @@ class HomeView(generic.TemplateView):
     def get_queryset(self):
         return Profile.objects.filter(active=True)
 
+from django.db.models import F, Sum, ExpressionWrapper, DecimalField
+from datetime import datetime
+
+from datetime import datetime
+from django.db.models import Sum, F, ExpressionWrapper, DecimalField
+
 class DashBoardView(generic.TemplateView):
     template_name = 'main/dashboard.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        products = Product.objects.filter(is_active=True)
-     
-        total_products_in_stock = products.aggregate(total_stock=Sum(F('up_to') - F('sold')))['total_stock']
+        current_month = datetime.now().month
+        current_year = datetime.now().year
         
-  
-        out_of_stock_products = products.filter(up_to=0).count()
-
-        total_clients = Client.objects.count()  
+        products = Product.objects.filter(is_active=True, created_at__month=current_month, created_at__year=current_year)
+        
+        total_sold_products = products.aggregate(total_sold=Sum('sold'))['total_sold'] or 0
         
         profit_per_product = ExpressionWrapper(
             (F('price') - F('cost_price')) * F('sold'),
             output_field=DecimalField()
         )
-        total_benefit = products.aggregate(total_benefit=Sum(profit_per_product))['total_benefit']
-
-      
-        total_sold_products = products.aggregate(
-            total_sold=Sum('sold')
-        )['total_sold']
-
-       
-        orders_this_month = total_sold_products  
+        total_income = products.aggregate(total_income=Sum(profit_per_product))['total_income'] or 0
+        
+        total_products_in_stock = products.aggregate(total_stock=Sum(F('up_to') - F('sold')))['total_stock'] or 0
+        out_of_stock_products = products.filter(up_to=0).count()
+        total_clients = Client.objects.count()
 
         context['total_products_in_stock'] = total_products_in_stock
         context['out_of_stock_products'] = out_of_stock_products
         context['total_clients'] = total_clients  
-        context['total_benefit'] = total_benefit  
-        context['total_sold_products'] = total_sold_products 
-        context['orders_this_month'] = orders_this_month 
+        context['total_income'] = total_income
+        context['total_sold_products'] = total_sold_products
 
         return context
 
-
-  
 class ProfileCreateView(generic.CreateView):
     fields = ['bio','profile_picture','website','date_of_birth',]
     template_name = 'profile_form.html'
@@ -462,6 +461,12 @@ class TransactionCreateView(generic.CreateView):
         transaction.user = self.request.user
 
         transaction.save() 
+
+        subject = f'New Transaction for {client.name}'
+        message = f'Dear {client.name},\n\nA new transaction has been processed on your account.\n\nTransaction Details:\nType: {transaction.get_transaction_type_display()}\nAmount: {transaction.amount}\n\nThank you for using our service.'
+        recipient = client.email
+
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [recipient])
 
         messages.success(self.request, f'Transaction for {client.name} successfully created!')
         return redirect('client-detail', pk=client.id)
