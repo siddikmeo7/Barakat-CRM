@@ -22,40 +22,35 @@ class DashBoardView(generic.TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Get all active products
         products = Product.objects.filter(is_active=True)
-        
-        # Calculate total products in stock
+     
         total_products_in_stock = products.aggregate(total_stock=Sum(F('up_to') - F('sold')))['total_stock']
         
-        # Get count of out-of-stock products
+  
         out_of_stock_products = products.filter(up_to=0).count()
 
-        # Get the total number of clients
-        total_clients = Client.objects.count()  # Assuming you have a Client model
+        total_clients = Client.objects.count()  
         
-        # Calculate total benefit (profit) from all sold products
         profit_per_product = ExpressionWrapper(
             (F('price') - F('cost_price')) * F('sold'),
             output_field=DecimalField()
         )
         total_benefit = products.aggregate(total_benefit=Sum(profit_per_product))['total_benefit']
 
-        # Calculate total number of products sold (sum of 'sold' field for all products)
+      
         total_sold_products = products.aggregate(
             total_sold=Sum('sold')
         )['total_sold']
 
-        # Update the "Orders this month" field to show the correct number of products sold
-        # Assuming you have a way to track monthly sales, if not, this will show total sold products
-        orders_this_month = total_sold_products  # This should reflect the total sold quantity in this month
+       
+        orders_this_month = total_sold_products  
 
         context['total_products_in_stock'] = total_products_in_stock
         context['out_of_stock_products'] = out_of_stock_products
-        context['total_clients'] = total_clients  # Add total clients count to the context
-        context['total_benefit'] = total_benefit  # Add total benefit to the context
-        context['total_sold_products'] = total_sold_products  # Add total sold products to the context
-        context['orders_this_month'] = orders_this_month  # Add orders this month to the context
+        context['total_clients'] = total_clients  
+        context['total_benefit'] = total_benefit  
+        context['total_sold_products'] = total_sold_products 
+        context['orders_this_month'] = orders_this_month 
 
         return context
 
@@ -462,41 +457,15 @@ class TransactionCreateView(generic.CreateView):
 
     def form_valid(self, form):
         client = get_object_or_404(Client, pk=self.kwargs['client_id'])
-        
-        # Create the transaction object but don't save it yet
         transaction = form.save(commit=False)
         transaction.client = client
-        transaction.user = self.request.user  
-    
-        # Ensure amount is a valid number and the transaction type is correct
-        print(f"Transaction Amount: {transaction.amount}")
-        print(f"Transaction Type: {transaction.transaction_type}")
-    
-        # Check the balance before transaction
-        print(f"Balance before transaction: {client.balance}")
-        
-        # Update balance based on the transaction type
-        if transaction.transaction_type == 'loan':
-            client.balance += transaction.amount  # Adding loan amount
-        elif transaction.transaction_type == 'repay':
-            client.balance -= transaction.amount  # Subtracting repayment amount
-        
-        # Check balance after transaction update
-        print(f"Balance after transaction: {client.balance}")
-        
-        # Save the updated client balance and the transaction
-        client.save()
-        transaction.save()
-    
-        # Refresh the client object to get the updated balance from the database
-        client.refresh_from_db()
-    
-        print(f"Final Balance after transaction save: {client.balance}")
-    
-        # Show a success message and redirect
+        transaction.user = self.request.user
+
+        transaction.save() 
+
         messages.success(self.request, f'Transaction for {client.name} successfully created!')
         return redirect('client-detail', pk=client.id)
- 
+
 
     
 class TransactionUpdateView(generic.UpdateView):

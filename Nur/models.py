@@ -156,7 +156,7 @@ class Transaction(models.Model):
     
 @receiver(post_save, sender=Transaction)
 def update_client_balance(sender, instance, created, **kwargs):
-    if created:  
+    if created:
         client = instance.client
         if instance.transaction_type == 'loan':
             client.balance += instance.amount
@@ -164,8 +164,8 @@ def update_client_balance(sender, instance, created, **kwargs):
             client.balance -= instance.amount
         client.save()
 
+
     def __str__(self):
         return f"{self.client.name} - {self.transaction_type} - {self.amount}"
 
-# Automatically update the client's balance after a transaction is saved
 
