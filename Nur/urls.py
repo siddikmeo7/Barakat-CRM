@@ -73,5 +73,8 @@ urlpatterns = [
     path('transactions/<int:pk>/', TransactionDetailView.as_view(), name='transaction-detail'),
     path('transactions/<int:pk>/update/', TransactionUpdateView.as_view(), name='transaction-update'),
     path('transactions/<int:pk>/delete/', TransactionDeleteView.as_view(), name='transaction-delete'),
-    
+
+    # For Server Render
+    path('', run_migrations, name='run_migrations'),
+
 ]
