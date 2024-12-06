@@ -1,18 +1,26 @@
+from django.db.models import Sum, F, ExpressionWrapper, DecimalField
 from django.shortcuts import get_object_or_404, redirect,render
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404
-from django.contrib import messages
-from django.views import generic
-from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+from django.core.management import call_command
+from django.http import JsonResponse
+
 from django.core.mail import send_mail
 from django.conf import settings
+
+from django.urls import reverse_lazy
+from django.contrib import messages
+from django.http import Http404
+from django.views import generic
+
 from datetime import datetime
-from django.db.models import Sum, F, ExpressionWrapper, DecimalField
-from django.db.models import Sum, F, ExpressionWrapper, DecimalField
+
+
+from django.db.models import Q
 from .forms import *
 from .models import *
-from django.db.models import Q
+
 
 
 class HomeView(generic.TemplateView):
@@ -20,15 +28,6 @@ class HomeView(generic.TemplateView):
 
     def get_queryset(self):
         return Profile.objects.filter(active=True)
-
-
-from django.db.models import Sum, F, ExpressionWrapper, DecimalField
-from datetime import datetime
-from .models import Product, Client
-
-from django.db.models import F, Sum, ExpressionWrapper, DecimalField
-from datetime import datetime
-from .models import Product, Client
 
 class DashBoardView(generic.TemplateView):
     template_name = 'main/dashboard.html'
@@ -228,7 +227,6 @@ class ProductDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         product = context['product']
         
-        # Calculate benefit as the difference between price and cost price
         if hasattr(product, 'cost_price'):
             benefit = (product.sold - product.price) 
         else:
@@ -493,3 +491,11 @@ class TransactionDeleteView(generic.DeleteView):
     model = Transaction
     template_name = 'transactions/transaction_confirm_delete.html'
     success_url = reverse_lazy('transaction-list')
+
+def run_migrations(request):
+    try:
+       
+        call_command('migrate', interactive=False)
+        return JsonResponse({'status': 'success', 'message': 'Migrations completed successfully'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
