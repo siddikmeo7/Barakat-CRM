@@ -9,7 +9,6 @@ from django.core.mail import send_mail
 from django.conf import settings
 from datetime import datetime
 from django.db.models import Sum, F, ExpressionWrapper, DecimalField
-from django.db.models import Sum, F, ExpressionWrapper, DecimalField
 from .forms import *
 from .models import *
 from django.db.models import Q
@@ -20,15 +19,6 @@ class HomeView(generic.TemplateView):
 
     def get_queryset(self):
         return Profile.objects.filter(active=True)
-
-
-from django.db.models import Sum, F, ExpressionWrapper, DecimalField
-from datetime import datetime
-from .models import Product, Client
-
-from django.db.models import F, Sum, ExpressionWrapper, DecimalField
-from datetime import datetime
-from .models import Product, Client
 
 class DashBoardView(generic.TemplateView):
     template_name = 'main/dashboard.html'
@@ -228,7 +218,6 @@ class ProductDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         product = context['product']
         
-        # Calculate benefit as the difference between price and cost price
         if hasattr(product, 'cost_price'):
             benefit = (product.sold - product.price) 
         else:
