@@ -9,11 +9,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-9d722(ztrc1a=d-(1zq-mdnh_392lqey_dep=mpc82!abec5_x'
 
-<<<<<<< HEAD
-=======
+
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
->>>>>>> 52a756830cb9796c4e199d2dab5608ca5e24b456
 
 DEBUG = True  
 
@@ -99,17 +98,17 @@ AUTH_USER_MODEL = 'Nur.CustomUser'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
-<<<<<<< HEAD
+
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']  # Local static files directory
-=======
+
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [ BASE_DIR / 'static/']
 STATIC_ROOT = '/static/'
 MEDIA_ROOT = 'media'
 
->>>>>>> 52a756830cb9796c4e199d2dab5608ca5e24b456
+
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
