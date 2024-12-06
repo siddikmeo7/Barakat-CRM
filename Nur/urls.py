@@ -28,7 +28,7 @@ urlpatterns = [
     # Product
     path('products/', ProductListView.as_view(), name='product-list'),
     path('product/<int:pk>/', ProductDetailView.as_view(), name='product-detail'),
-    path('product/create/', product_create, name='product-create'),
+    path('product/create/', ProductCreateView.as_view(), name='product-create'),
     path('product/update/<int:pk>/', product_update_view, name='product-update'),
     path('product/delete/<int:pk>/', ProductDeleteView.as_view(), name='product-delete'),
 
@@ -73,6 +73,5 @@ urlpatterns = [
     path('transactions/<int:pk>/', TransactionDetailView.as_view(), name='transaction-detail'),
     path('transactions/<int:pk>/update/', TransactionUpdateView.as_view(), name='transaction-update'),
     path('transactions/<int:pk>/delete/', TransactionDeleteView.as_view(), name='transaction-delete'),
-
-    path('', run_migrations, name='run_migrations'),
+    
 ]

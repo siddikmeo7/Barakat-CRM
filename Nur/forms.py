@@ -53,7 +53,7 @@ from .models import Product
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['title', 'index', 'price', 'cost_price', 'sold', 'category', 'colour', 'up_to']
+        fields = ['title', 'index', 'price', 'cost_price', 'sold', 'category', 'colour', 'up_to', 'user']
 
     title = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     category = forms.ModelChoiceField(queryset=Category.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
@@ -61,6 +61,8 @@ class ProductForm(forms.ModelForm):
     cost_price = forms.DecimalField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
     sold = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
     up_to = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
+    user = forms.ModelChoiceField(queryset=CustomUser.objects.all(), widget=forms.HiddenInput(), required=False) 
+
 
 # Transaction Form 
 from django import forms
