@@ -4,7 +4,7 @@ from .models import *
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
     list_display = ['username', 'email', 'phone_number', 'address', 'created_at', 'last_password_reset']
-    list_filter = ['country', 'city', 'address']
+    list_filter = ['address']
     search_fields = ['username', 'email', 'phone_number', 'address']
 
 @admin.register(Transaction)
@@ -12,18 +12,6 @@ class TransactionAdmin(admin.ModelAdmin):
     list_display = ('client', 'transaction_type', 'amount', 'created_at', 'user')
     list_filter = ('transaction_type', 'created_at')
     search_fields = ('client__name', 'user__username', 'comments')
-
-@admin.register(Country)
-class CountryAdmin(admin.ModelAdmin):
-    list_display = ['name']
-    search_fields = ['name']
-
-
-@admin.register(City)
-class CityAdmin(admin.ModelAdmin):
-    list_display = ['name', 'country']
-    list_filter = ['country']
-    search_fields = ['name', 'country']
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):

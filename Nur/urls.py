@@ -11,20 +11,6 @@ urlpatterns = [
     path('profile/update/<int:pk>/', create_or_edit_profile, name='update-profile'),
     path('profile/delete/<int:pk>/', ProfileDeleteView.as_view(), name='delete-profile'),
 
-    # Country
-    path('countries/', CountryListView.as_view(), name='country-list'),
-    path('country/<int:pk>/', CountryDetailView.as_view(), name='country-detail'),
-    path('country/create/', CountryCreateView.as_view(), name='country-create'),
-    path('country/update/<int:pk>/', CountryUpdateView.as_view(), name='country-update'),
-    path('country/delete/<int:pk>/', CountryDeleteView.as_view(), name='country-delete'),
-
-    # City
-    path('cities/', CityListView.as_view(), name='city-list'),
-    path('city/<int:pk>/', CityDetailView.as_view(), name='city-detail'),
-    path('city/create/', CityCreateView.as_view(), name='city-create'),
-    path('city/update/<int:pk>/', CityUpdateView.as_view(), name='city-update'),
-    path('city/delete/<int:pk>/', CityDeleteView.as_view(), name='city-delete'),
-
     # Product
     path('products/', ProductListView.as_view(), name='product-list'),
     path('product/<int:pk>/', ProductDetailView.as_view(), name='product-detail'),

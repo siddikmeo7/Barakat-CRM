@@ -18,8 +18,6 @@ class CustomUser(AbstractUser):
             )
         ]
     )
-    country = models.ForeignKey("Nur.Country", on_delete=models.CASCADE, related_name="users",null=True,blank=True)
-    city = models.ForeignKey("Nur.City", on_delete=models.CASCADE, related_name="users", null=True, blank=True)
     address = models.TextField(null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     last_password_reset = models.DateTimeField(null=True, blank=True)
@@ -63,22 +61,6 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"Profile of {self.user.username}"
-
-# Location Models
-class Country(models.Model):
-    name = models.CharField(max_length=50)
-    is_active = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.name
-
-class City(models.Model):
-    name = models.CharField(max_length=50)
-    country = models.ForeignKey("Nur.Country", on_delete=models.CASCADE, related_name="cities")
-    is_active = models.BooleanField(default=True)
-
-    def __str__(self):
-        return f"{self.name} (Country: {self.country.name})"
 
 # Product Models
 class Product(models.Model):

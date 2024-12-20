@@ -3,30 +3,14 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import *
 # User
 class UserSignupForm(forms.ModelForm):
-    country = forms.ModelChoiceField(queryset=Country.objects.all(), empty_label="Select a country")
-    city = forms.ModelChoiceField(queryset=City.objects.none(), empty_label="Select a city")
-
     class Meta:
         model = CustomUser
-        fields = ['username', 'password', 'country', 'city']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if 'country' in self.data:
-            try:
-                country_id = int(self.data.get('country'))
-                self.fields['city'].queryset = City.objects.filter(country_id=country_id)
-            except (ValueError, TypeError):
-                pass
-        elif self.instance.pk:
-            self.fields['city'].queryset = self.instance.country.cities.all()
+        fields = ['username', 'password']
 
 class CustomUserForm(UserCreationForm):
-    country = forms.ModelChoiceField(queryset=Country.objects.all(), empty_label="Select a country")
-    city = forms.ModelChoiceField(queryset=City.objects.none(), empty_label="Select a city")
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'country', 'city', 'address', 'password1', 'password2']
+        fields = ['username', 'email', 'address', 'password1', 'password2']
 
     def clean(self):
         cleaned_data = super().clean()
@@ -46,9 +30,6 @@ class ProfileForm(forms.ModelForm):
         profile_picture = forms.URLField(required=False)
         website = forms.URLField(required=False)
 
-from django import forms
-from .models import Product
-
 # Products
 class ProductForm(forms.ModelForm):
     class Meta:
@@ -62,11 +43,6 @@ class ProductForm(forms.ModelForm):
     sold = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
     up_to = forms.IntegerField(widget=forms.NumberInput(attrs={'class': 'form-control'}))
     user = forms.ModelChoiceField(queryset=CustomUser.objects.all(), widget=forms.HiddenInput(), required=False) 
-
-
-# Transaction Form 
-from django import forms
-from .models import Transaction
 
 class TransactionForm(forms.ModelForm):
     class Meta:
