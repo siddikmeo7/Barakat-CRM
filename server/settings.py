@@ -18,6 +18,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']  
 
+CSRF_COOKIE_SECURE = True
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -26,13 +28,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'accounts.apps.AccountsConfig',  # Registration
-    'Nur.apps.NurConfig',  # Base Application
+    # 3rd party 
+    'corsheaders',
     'django_bootstrap5',  # Bootstrap Styles
     'widget_tweaks',  # Styling forms with Bootstrap
+    # locals 
+    'accounts.apps.AccountsConfig',  # Registration
+    'Nur.apps.NurConfig',  # Base Application
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
