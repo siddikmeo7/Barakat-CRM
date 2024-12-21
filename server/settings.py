@@ -12,11 +12,15 @@ SECRET_KEY = 'django-insecure-9d722(ztrc1a=d-(1zq-mdnh_392lqey_dep=mpc82!abec5_x
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
 DEBUG = True  
 
 ALLOWED_HOSTS = ['*']  
+
+
+CORS_ALLOW_ALL_ORIGINS = True  
+CSRF_TRUSTED_ORIGINS = ["*"]  
+
+
 
 CSRF_COOKIE_SECURE = True
 
@@ -38,7 +42,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware', # For Cros
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -46,6 +50,15 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+# Password Hash for securaty of User's
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://barakat-crm.onrender.com", 
 ]
 
 ROOT_URLCONF = 'server.urls'

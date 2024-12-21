@@ -49,3 +49,10 @@ class SkladProductAdmin(admin.ModelAdmin):
     list_display = ['sklad', 'product', 'quantity']
     list_filter = ['sklad', 'product']
     search_fields = ['sklad__name', 'product__name']
+
+
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+   list_display = ['user','client','product',]

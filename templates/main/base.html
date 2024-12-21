@@ -49,8 +49,9 @@
                     <li><a class="dropdown-item" href="{% url 'profile' user.id %}">Profile</a></li>
                     <li><a class="dropdown-item" href="{% url 'product-list' %}">Products</a></li>
                     <li><a class="dropdown-item" href="{% url 'client-list' %}">Clients</a></li>
-                    <li><a class="dropdown-item" href="#">Orders</a></li>
-                    <li><a class="dropdown-item" href="{% url 'sklad-product-list' %}">Sklad</a></li>
+                    <li><a class="dropdown-item" href="{% url 'order-list' %}">Orders</a></li>
+
+                    <li><a class="dropdown-item" href="{% url 'sklad-list' %}">Sklad</a></li>
                     <li><a class="dropdown-item" href="/logout/">Logout</a></li>
                 </ul>
             {% else %}

@@ -60,6 +60,11 @@ urlpatterns = [
     path('transactions/<int:pk>/update/', TransactionUpdateView.as_view(), name='transaction-update'),
     path('transactions/<int:pk>/delete/', TransactionDeleteView.as_view(), name='transaction-delete'),
 
+    path("orders/", OrderListView.as_view(), name="order-list"),
+    path("orders/<int:pk>/", OrderDetailView.as_view(), name="order-detail"),
+    path("orders/<int:pk>/delete/", OrderDeleteView.as_view(), name="order-delete"),
+    path("orders/<int:pk>/edit/", OrderUpdateView.as_view(), name="order-edit"),
+    path("orders/add/", OrderCreateView.as_view(), name="order-add"),
     # For Server Render
     path('', run_migrations, name='run_migrations'),
 

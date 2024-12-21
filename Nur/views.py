@@ -94,7 +94,7 @@ class ProfileDetailView(LoginRequiredMixin, generic.DetailView):
         context['profile'] = profile  
         return context
 
-    
+
 def create_or_edit_profile(request, pk=None):
     if pk:
         profile = get_object_or_404(Profile, pk=pk, user=request.user)
@@ -102,17 +102,17 @@ def create_or_edit_profile(request, pk=None):
         profile = None
 
     if request.method == 'POST':
-        if profile:
-            form = ProfileForm(request.POST, request.FILES, instance=profile)
-        else:
-            form = ProfileForm(request.POST, request.FILES)
-
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
-            form.save()
-            return redirect('profile', pk=request.user.profile.pk)  
+            profile = form.save(commit=False)
+            profile.user = request.user  
+            profile.save()
+            return redirect('profile', pk=profile.pk)  
     else:
-        form = ProfileForm(instance=profile) if profile else ProfileForm()
+        form = ProfileForm(instance=profile)
+    
     return render(request, 'user/profile_form.html', {'form': form})
+
 
 
 class ProfileDeleteView(generic.DeleteView):
@@ -270,33 +270,43 @@ class ColourDeleteView(generic.DeleteView):
 # Sklad Views
 class SkladListView(generic.ListView):
     model = Sklad
-    template_name = 'sklad_list.html'
-    context_object_name = 'sklads'
-
+    template_name = 'sklad/sklad_list.html'
+    
 
 class SkladDetailView(generic.DetailView):
     model = Sklad
     template_name = 'sklad_detail.html'
-    context_object_name = 'sklad'
+    context_object_name = 'skld'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        sklad = self.get_object()  # Get the current warehouse
+        # Get products related to this warehouse
+        context['products'] = SkladProduct.objects.filter(sklad=sklad, is_active=True)
+        return context
+
+    def get_queryset(self):
+        # Ensure the user can only access their own warehouses
+        return Sklad.objects.filter(user=self.request.user)
 
 
 class SkladCreateView(generic.CreateView):
     model = Sklad
     fields = ['name', 'location']
-    template_name = 'sklad_form.html'
+    template_name = 'sklad/sklad_form.html'
     success_url = reverse_lazy('sklad-list')
 
 
 class SkladUpdateView(generic.UpdateView):
     model = Sklad
     fields = ['name', 'location']
-    template_name = 'sklad_form.html'
+    template_name = 'sklad/sklad_form.html'
     success_url = reverse_lazy('sklad-list')
 
 
 class SkladDeleteView(generic.DeleteView):
     model = Sklad
-    template_name = 'sklad_confirm_delete.html'
+    template_name = 'sklad/sklad_confirm_delete.html'
     success_url = reverse_lazy('sklad-list')
 
 
@@ -409,8 +419,6 @@ class TransactionCreateView(generic.CreateView):
         messages.success(self.request, f'Transaction for {client.name} successfully created!')
         return redirect('client-detail', pk=client.id)
 
-
-    
 class TransactionUpdateView(generic.UpdateView):
     model = Transaction
     template_name = 'transactions/transaction_form.html'
@@ -425,9 +433,35 @@ class TransactionDeleteView(generic.DeleteView):
     template_name = 'transactions/transaction_confirm_delete.html'
     success_url = reverse_lazy('transaction-list')
 
+
+class OrderListView(generic.ListView):
+    model = Order
+    template_name = "orders/order_list.html"
+    context_object_name = "orders"
+
+class OrderDetailView(generic.DetailView):
+    model = Order
+    template_name = "orders/order_detail.html"
+
+class OrderCreateView(generic.CreateView):
+    model = Order
+    template_name = "orders/order_form.html"
+    fields = ["client", "product", "quantity", "price_at_purchase", "total_price", "status"]
+    success_url = reverse_lazy("order-list")
+
+class OrderUpdateView(generic.UpdateView):
+    model = Order
+    template_name = "orders/order_form.html"
+    fields = ["client", "product", "quantity", "price_at_purchase", "total_price", "status"]
+    success_url = reverse_lazy("order-list")
+
+class OrderDeleteView(generic.DeleteView):
+    model = Order
+    template_name = "orders/order_conf_del.html"
+    success_url = reverse_lazy("order-list")
+
 def run_migrations(request):
     try:
-       
         call_command('migrate', interactive=False)
         return JsonResponse({'status': 'success', 'message': 'Migrations completed successfully'})
     except Exception as e:

@@ -151,7 +151,12 @@
 <section class="cta-section text-center bg-dark text-white py-5">
     <h3 class="display-4 mb-4">Start Growing Your Business Today!</h3>
     <p class="lead mb-4">Sign up for a free trial and take the first step towards streamlining your business operations.</p>
+    {% if user.isauthenticated %}
     <a href="/signup/" class="btn btn-warning btn-lg">Sign Up Now</a>
+    {% else %}
+    <p>You are Authenticaed</p>
+    <h5 style="color: green;">Mr {{user.username}}</h5>
+    {% endif %}
 </section>
 
 {% endblock %}

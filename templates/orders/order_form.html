@@ -1,0 +1,13 @@
+{% extends "main/base.html" %}
+{% block title %}Order Form - Nur CRM{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">{% if object %}Edit Order{% else %}Add New Order{% endif %}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">{% if object %}Save Changes{% else %}Create Order{% endif %}</button>
+    <a href="{% url 'order-list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

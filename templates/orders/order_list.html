@@ -1,0 +1,40 @@
+{% extends "main/base.html" %}
+{% block title %}Orders - Nur CRM{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center">
+    <h1 class="mb-4">Orders</h1>
+    <a href="{% url 'order-add' %}" class="btn btn-primary">Add Order</a>
+</div>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>#</th>
+            <th>Client</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Status</th>
+            <th>Total Price</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.client.name }}</td>
+            <td>{{ order.product.title }}</td>
+            <td>{{ order.quantity }}</td>
+            <td>{{ order.status }}</td>
+            <td>${{ order.total_price }}</td>
+            <td>
+                <a href="{% url 'order-detail' order.id %}" class="btn btn-info btn-sm">View</a>
+                <a href="{% url 'order-edit' order.id %}" class="btn btn-warning btn-sm">Edit</a>
+                <a href="{% url 'order-delete' order.id %}" class="btn btn-danger btn-sm">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

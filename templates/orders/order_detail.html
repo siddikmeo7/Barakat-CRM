@@ -1,0 +1,23 @@
+{% extends "main/base.html" %}
+{% block title %}Order Detail - Nur CRM{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Order #{{ object.id }}</h1>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Client: {{ object.client.name }}</h5>
+        <p class="card-text"><strong>Product:</strong> {{ object.product.title }}</p>
+        <p class="card-text"><strong>Quantity:</strong> {{ object.quantity }}</p>
+        <p class="card-text"><strong>Status:</strong> {{ object.status }}</p>
+        <p class="card-text"><strong>Total Price:</strong> ${{ object.total_price }}</p>
+        <p class="card-text"><strong>Date:</strong> {{ object.created_at|date:"F j, Y, g:i a" }}</p>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between">
+    <a href="{% url 'order-edit' object.id %}" class="btn btn-warning">Edit Order</a>
+    <a href="{% url 'order-delete' object.id %}" class="btn btn-danger">Delete Order</a>
+    <a href="{% url 'order-list' %}" class="btn btn-secondary">Back to Orders</a>
+</div>
+{% endblock %}

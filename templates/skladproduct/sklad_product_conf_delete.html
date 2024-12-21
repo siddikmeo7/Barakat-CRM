@@ -5,7 +5,8 @@
 {% block content %}
     <div class="container mt-4">
         <h1>Are you sure you want to delete this product?</h1>
-        <p><strong>Product:</strong> {{ sklad_product.product.name }}</p>
+        <p>ID:<strong>{{sklad_product.id}}<strong></p>
+        <p><strong>Product:</strong> {{ sklad_product.product.title }}</p>
         <p><strong>Quantity:</strong> {{ sklad_product.quantity }}</p>
         <p><strong>Sklad:</strong> {{ sklad_product.sklad.name }}</p>
         <form method="post">

@@ -30,6 +30,11 @@ class ProfileForm(forms.ModelForm):
         profile_picture = forms.URLField(required=False)
         website = forms.URLField(required=False)
 
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields['website'].required = False  # Make website optional
+
+
 # Products
 class ProductForm(forms.ModelForm):
     class Meta:
