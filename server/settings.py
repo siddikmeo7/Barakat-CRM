@@ -9,18 +9,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-9d722(ztrc1a=d-(1zq-mdnh_392lqey_dep=mpc82!abec5_x'
 
-
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True  
 
 ALLOWED_HOSTS = ['*']  
 
-
 CORS_ALLOW_ALL_ORIGINS = True  
 CSRF_TRUSTED_ORIGINS = ["*"]  
-
-
 
 CSRF_COOKIE_SECURE = True
 
@@ -42,17 +37,18 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware', # For Cros
+    'corsheaders.middleware.CorsMiddleware', # For CORS
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',  # Add caching middleware
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',  # Add caching middleware
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# Password Hash for securaty of User's
+# Password Hash for security of User's
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.Argon2PasswordHasher",
 ]
@@ -117,17 +113,11 @@ AUTH_USER_MODEL = 'Nur.CustomUser'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
-
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']  # Local static files directory
-
-
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [ BASE_DIR / 'static/']
-STATIC_ROOT = '/static/'
-MEDIA_ROOT = 'media'
-
-
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Directory to collect static files for production
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -137,12 +127,31 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False  # Use either TLS or SSL, not both
+EMAIL_USE_SSL = False 
 EMAIL_HOST_USER = 'siddikme.o7@gmail.com'
-EMAIL_HOST_PASSWORD = 'josj pbqw vdcq mnyc'  # Ensure to use environment variables for security
+EMAIL_HOST_PASSWORD = 'josj pbqw vdcq mnyc' 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Authentication redirect settings
 LOGIN_URL = 'login'  # URL for the login page
 LOGIN_REDIRECT_URL = "home"  # URL after successful login
-LOGOUT_REDIRECT_URL = "login"  # URL after logout
+LOGOUT_REDIRECT_URL = "login"  # URL after logout  
+
+# Caching configuration
+# Using Memcached
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': BASE_DIR / 'django_cache',
+        #'LOCATION': '127.0.0.1:11211', 
+    }
+}
+
+# Cache timeout settings
+CACHE_MIDDLEWARE_ALIAS = 'default'
+CACHE_MIDDLEWARE_SECONDS = 600  # Cache for 10 minutes
+CACHE_MIDDLEWARE_KEY_PREFIX = 'barakat_crm'
+
+# Session caching
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'

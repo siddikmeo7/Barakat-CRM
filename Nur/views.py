@@ -408,16 +408,42 @@ class TransactionCreateView(generic.CreateView):
         transaction.client = client
         transaction.user = self.request.user
 
-        transaction.save() 
+        # Calculate the new balance based on the transaction type
+        if transaction.transaction_type == 'debit':  # Assuming 'debit' means subtraction
+            new_balance = client.balance - transaction.amount
+            if new_balance < 0:
+                messages.error(
+                    self.request,
+                    f'Transaction failed! The balance for {client.name} cannot go below zero.'
+                )
+                return self.form_invalid(form)
+        elif transaction.transaction_type == 'credit':  # Assuming 'credit' means addition
+            new_balance = client.balance + transaction.amount
 
+        # Update the client's balance
+        client.balance = new_balance
+        client.save()
+
+        transaction.save()
+
+        # Send notification email
         subject = f'New Transaction for {client.name}'
-        message = f'Dear {client.name},\n\nA new transaction has been processed on your account.\n\nTransaction Details:\nType: {transaction.get_transaction_type_display()}\nAmount: {transaction.amount}\n\nThank you for using our service.'
-        recipient = client.email
+        message = f'''Dear {client.name},
 
+A new transaction has been processed on your account.
+
+Transaction Details:
+Type: {transaction.get_transaction_type_display()}
+Amount: {transaction.amount}
+
+Thank you for using our service.'''
+        recipient = client.email
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [recipient])
 
+        # Success message
         messages.success(self.request, f'Transaction for {client.name} successfully created!')
         return redirect('client-detail', pk=client.id)
+
 
 class TransactionUpdateView(generic.UpdateView):
     model = Transaction
@@ -459,6 +485,84 @@ class OrderDeleteView(generic.DeleteView):
     model = Order
     template_name = "orders/order_conf_del.html"
     success_url = reverse_lazy("order-list")
+
+# # Shop Part of the Project 
+
+# class ShopHome(generic.TemplateView):
+#     template_name = 'shop/shop_home.html'
+
+
+class ShopProductListView(generic.ListView):
+    model = ShopProduct
+    template_name = 'shop/shop_home.html'
+    context_object_name = 'products'
+
+class ShopProductDetailView(generic.DetailView):
+    model = ShopProduct
+    template_name = 'shop/product_detail.html'
+    context_object_name = 'product'
+
+class ShopProductCreateView(generic.CreateView):
+    model = ShopProduct
+    form_class = ShopProductForm
+    template_name = 'shop/product_form.html'
+    success_url = reverse_lazy('shop-home')
+
+
+class ShopProductUpdateView(generic.UpdateView):
+    model = ShopProduct
+    form_class = ShopProductForm
+    template_name = 'shop/product_form.html'
+    success_url = reverse_lazy('shop-home')
+
+
+class ShopProductDeleteView(generic.DeleteView):
+    model = ShopProduct
+    template_name = 'shop/product_confirm_delete.html'
+    success_url = reverse_lazy('shop-home')
+
+
+# CartItem Views
+class CartItemListView(generic.ListView):
+    model = CartItem
+    template_name = 'shop/cart.html'
+    context_object_name = 'cart_items'
+
+
+class CartItemCreateView(generic.CreateView):
+    model = CartItem
+    form_class = CartItemForm
+    template_name = 'shop/cartitem_form.html'
+    success_url = reverse_lazy('cartitem-list')
+
+    def form_valid(self, form):
+        # Decrease product stock when adding an item to the cart
+        cart_item = form.save(commit=False)
+        cart_item.product.stock -= cart_item.quantity
+        if cart_item.product.stock < 0:
+            return JsonResponse({"error": "Insufficient stock"}, status=400)
+        cart_item.product.save()
+        return super().form_valid(form)
+
+
+class CartItemDeleteView(generic.DeleteView):
+    model = CartItem
+    template_name = 'shop/cartitem_confirm_delete.html'
+    success_url = reverse_lazy('shop:cartitem-list')
+
+    def delete(self, request, *args, **kwargs):
+        cart_item = self.get_object()
+        cart_item.product.stock += cart_item.quantity  # Restore stock on delete
+        cart_item.product.save()
+        return super().delete(request, *args, **kwargs)
+
+
+class Cart(generic.TemplateView):
+    template_name = 'shop/cart.html'
+
+class Checkout(generic.TemplateView):
+    template_name = 'shop/checkout.html'
+    
 
 def run_migrations(request):
     try:

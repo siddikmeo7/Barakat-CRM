@@ -1,0 +1,36 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Shop | Nur CRM{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Welcome to the Shop</h1>
+
+    <!-- Button to Add a New Product -->
+    <div class="text-center mb-4">
+        <a href="#" class="btn btn-success btn-lg">Add New Product</a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Example Categories -->
+        <div class="col-12 col-sm-6 col-md-4">
+            <div class="card shop-card">
+                <img src="" class="card-img-top" alt="Category 1">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Category 1</h5>
+                    <a href="" class="btn btn-primary btn-sm">View Products</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4">
+            <div class="card shop-card">
+                <img src="" class="card-img-top" alt="Category 2">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Category 2</h5>
+                    <a href="" class="btn btn-primary btn-sm">View Products</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

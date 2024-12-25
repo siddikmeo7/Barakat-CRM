@@ -55,3 +55,21 @@ class TransactionForm(forms.ModelForm):
         fields = ['client', 'transaction_type', 'amount', 'comments']
 
 
+class ShopCategoryForm(forms.ModelForm):
+    class Meta:
+        model = ShopCategory
+        fields = ['name', 'is_active']
+
+
+class ShopProductForm(forms.ModelForm):
+    class Meta:
+        model = ShopProduct
+        fields = ['name', 'category', 'description', 'price', 'stock', 'image', 'is_active']
+
+
+class CartItemForm(forms.ModelForm):
+    class Meta:
+        model = CartItem
+        fields = ['product', 'quantity', 'is_active']
+
+

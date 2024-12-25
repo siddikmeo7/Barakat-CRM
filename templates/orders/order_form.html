@@ -2,12 +2,81 @@
 {% block title %}Order Form - Nur CRM{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">{% if object %}Edit Order{% else %}Add New Order{% endif %}</h1>
+<div class="container my-5">
+    <h1 class="mb-4 text-center">{% if object %}Edit Order{% else %}Add New Order{% endif %}</h1>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">{% if object %}Save Changes{% else %}Create Order{% endif %}</button>
-    <a href="{% url 'order-list' %}" class="btn btn-secondary">Cancel</a>
-</form>
+    <div class="card shadow-sm rounded">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- Client -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="id_client" class="form-label">Client</label>
+                    </div>
+                    <div class="col-md-8">
+                        {{ form.client }}
+                    </div>
+                </div>
+
+                <!-- Product -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="id_product" class="form-label">Product</label>
+                    </div>
+                    <div class="col-md-8">
+                        {{ form.product }}
+                    </div>
+                </div>
+
+                <!-- Quantity -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="id_quantity" class="form-label">Quantity</label>
+                    </div>
+                    <div class="col-md-8">
+                        {{ form.quantity }}
+                    </div>
+                </div>
+
+                <!-- Price at Purchase -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="id_price_at_purchase" class="form-label">Price at Purchase</label>
+                    </div>
+                    <div class="col-md-8">
+                        {{ form.price_at_purchase }}
+                    </div>
+                </div>
+
+                <!-- Total Price -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="id_total_price" class="form-label">Total Price</label>
+                    </div>
+                    <div class="col-md-8">
+                        {{ form.total_price }}
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="id_status" class="form-label">Status</label>
+                    </div>
+                    <div class="col-md-8">
+                        {{ form.status }}
+                    </div>
+                </div>
+
+                <!-- Submit and Cancel Buttons -->
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="submit" class="btn btn-success">{% if object %}Save Changes{% else %}Create Order{% endif %}</button>
+                    <a href="{% url 'order-list' %}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

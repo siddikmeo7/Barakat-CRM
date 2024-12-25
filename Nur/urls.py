@@ -65,6 +65,10 @@ urlpatterns = [
     path("orders/<int:pk>/delete/", OrderDeleteView.as_view(), name="order-delete"),
     path("orders/<int:pk>/edit/", OrderUpdateView.as_view(), name="order-edit"),
     path("orders/add/", OrderCreateView.as_view(), name="order-add"),
+    # Shope Path's
+    path('shop/',ShopProductListView.as_view(),name='shop-home'),
+    path('cart/',CartItemListView.as_view(),name='cart'),
+    path('checkout/',Checkout.as_view(),name='checkout'),
     # For Server Render
     path('', run_migrations, name='run_migrations'),
 
