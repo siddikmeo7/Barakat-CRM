@@ -23,7 +23,7 @@ This project demonstrates a custom implementation of Django's authentication sys
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/custom-authentication.git
+   git clone https://github.com/siddikmeo7/custom-authentication.git
    ```
 
 2. Navigate to the project directory:
