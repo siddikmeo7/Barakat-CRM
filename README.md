@@ -1,133 +1,108 @@
-# Custom Authentication and Password Reset in Django
+# Nur CRM
 
-This project demonstrates a custom implementation of Django's authentication system, including login, logout, user signup, and password reset functionalities.
+**Nur CRM** is a web application designed to help businesses manage their clients, track product sales, and calculate profits efficiently. It leverages Django's powerful features and offers a user-friendly interface for seamless business management.
 
 ## Features
 
-- **Custom Login**
-  - Supports a custom login template.
-  - Redirects users to a specific page after successful login.
+- **User Authentication**: Custom login and signup functionality with email-based authentication.
+- **Client Management**: Add, view, and manage client details.
+- **Product Management**: Track products, prices, stock, and sales.
+- **Profit Calculation**: Automatically calculate benefits based on sales data.
+- **Email Notifications**: Send emails to users upon registration or during specific actions (e.g., password reset).
+- **Password Management**: Custom password reset functionality with permissions and email validation.
 
-- **Custom Logout**
-  - Redirects users to a custom logout page after logging out.
+## Technologies Used
 
-- **User Signup**
-  - Allows new users to sign up using a custom form.
-  - Sends a welcome email to the registered email address.
-
-- **Password Reset**
-  - Supports email-based password reset.
-  - Restricts frequent password reset requests (minimum interval: 1 hour).
+- **Backend**: Django (Python)
+- **Frontend**: HTML, CSS (customized templates)
+- **Database**: PostgreSQL
+- **Email**: Django's `send_mail` for email notifications
 
 ## Installation
 
 1. Clone the repository:
+
    ```bash
-   git clone https://github.com/siddikmeo7/custom-authentication.git
+   git clone https://github.com/siddikmeo7/NurCRM.git
+   cd nur-crm
    ```
 
-2. Navigate to the project directory:
+2. Create and activate a virtual environment:
+
    ```bash
-   cd custom-authentication
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows, use .venv\Scripts\activate
    ```
 
-3. Create a virtual environment and activate it:
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   ```
+3. Install the dependencies:
 
-4. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-5. Apply migrations:
+4. Set up the database:
+
    ```bash
+   python manage.py makemigrations
    python manage.py migrate
    ```
 
-6. Create a superuser:
+5. Create a superuser for accessing the admin panel:
+
    ```bash
    python manage.py createsuperuser
    ```
 
-7. Run the development server:
+6. Run the development server:
+
    ```bash
    python manage.py runserver
    ```
 
-8. Access the application at `http://127.0.0.1:8000/`.
+7. Open the application in your browser:
+
+   ```
+   http://127.0.0.1:8000/
+   ```
 
 ## Usage
 
-### Custom Views
+- Access the admin panel to manage the application: `http://127.0.0.1:8000/admin/`
+- Register a new user or log in with an existing account.
+- Navigate through the dashboard to add clients, manage products, and track profits.
 
-#### LoginView
-- Template: `registration/login.html`
-- Redirects to `home` on successful login.
+## Project Structure
 
-#### CustomLogoutView
-- Redirects to a custom logout page after logout.
-
-#### UserSignupForm
-- Template: `registration/signup.html`
-- Sends a welcome email upon successful registration.
-
-#### Password Reset Views
-- **CustomPasswordResetView**: 
-  - Restricts users from requesting a password reset more than once every hour.
-- **CustomPasswordResetDoneView**: 
-  - Displays a confirmation message after a password reset email is sent.
-- **CustomPasswordResetConfirmView**: 
-  - Allows users to set a new password using a confirmation link.
-- **CustomPasswordResetCompleteView**: 
-  - Informs users of a successful password reset.
-
-### Email Configuration
-
-To enable email functionality, configure your email settings in `settings.py`:
-
-```python
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'your_smtp_server'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your_email@example.com'
-EMAIL_HOST_PASSWORD = 'your_email_password'
+```
+NurCRM/
+├── accounts/          # Custom user authentication and management
+├── products/          # Product management app
+├── clients/           # Client management app
+├── templates/         # HTML templates
+├── static/            # Static files (CSS, JS, images)
+├── Nur/               # Main project configuration
+└── requirements.txt   # Project dependencies
 ```
 
-### Permission Handling
+## Key Code Examples
 
-The password reset functionality requires the `auth.change_user` permission.
-
-## Code Structure
-
-### Views
-
-- **LoginView**: Handles user login.
-- **CustomLogoutView**: Handles user logout.
-- **UserSignupForm**: Manages user registration.
-- **Password Reset Views**: Handle the entire password reset process with customization.
-
-### Forms
-
-- **CustomUserForm**: Define your custom user signup form in `Nur.forms`.
-
-## Example Code Snippet
+### Custom Login View
 
 ```python
-from django.http import HttpResponseForbidden
-from django.utils.timezone import now
+class LoginView(DjangoLoginView):
+    template_name = 'registration/login.html'
+    success_url = reverse_lazy('home')
+```
 
+### Custom Password Reset
+
+```python
 class CustomPasswordResetView(PermissionRequiredMixin, DjangoPasswordResetView):
     permission_required = 'auth.change_user'
-
     def form_valid(self, form):
         email = form.cleaned_data["email"]
         users = form.get_users(email)
         user = users.first()
-
         if user:
             if user.last_password_reset and (now() - user.last_password_reset).total_seconds() < 3600:
                 return HttpResponseForbidden("A password reset email has already been sent. Please try again later.")
@@ -138,7 +113,13 @@ class CustomPasswordResetView(PermissionRequiredMixin, DjangoPasswordResetView):
 
 ## Contributing
 
-Contributions are welcome! Please fork this repository and submit a pull request for any changes or enhancements.
+Contributions are welcome! Feel free to fork the repository and submit a pull request.
+
+1. Fork the repository.
+2. Create a new branch: `git checkout -b feature-name`.
+3. Commit your changes: `git commit -m 'Add some feature'`.
+4. Push to the branch: `git push origin feature-name`.
+5. Open a pull request.
 
 ## License
 
@@ -146,6 +127,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Contact
 
-For any questions or feedback, please reach out to:
-- Email: `your_email@example.com`
-- GitHub: [yourusername](https://github.com/yourusername)
+For inquiries or support, please contact **Abubakr Khusainov** at `your-email@example.com`.
