@@ -37,16 +37,17 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware', # For CORS
     'django.middleware.security.SecurityMiddleware',
-    'django.middleware.cache.UpdateCacheMiddleware',  # Add caching middleware
+    'django.contrib.sessions.middleware.SessionMiddleware',  # Required for admin
+    'django.middleware.cache.UpdateCacheMiddleware',         # Caching middleware
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.cache.FetchFromCacheMiddleware',  # Add caching middleware
+    'django.middleware.cache.FetchFromCacheMiddleware',      # Caching middleware
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # Required for admin
+    'django.contrib.messages.middleware.MessageMiddleware',      # Required for admin
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 # Password Hash for security of User's
 PASSWORD_HASHERS = [
@@ -139,13 +140,13 @@ LOGOUT_REDIRECT_URL = "login"  # URL after logout
 
 # Caching configuration
 # Using Memcached
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': BASE_DIR / 'django_cache',
-        #'LOCATION': '127.0.0.1:11211', 
-    }
-}
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+#         'LOCATION': BASE_DIR / 'django_cache',
+#         #'LOCATION': '127.0.0.1:11211', 
+#     }
+# }
 
 # Cache timeout settings
 CACHE_MIDDLEWARE_ALIAS = 'default'
